@@ -471,12 +471,16 @@ footer{background:#030303;padding:32px 8vw;display:flex;justify-content:space-be
 <div class="inv-cta">
   <h2>LET'S HAVE<br>THE <span>CONVERSATION.</span></h2>
   <p>We're talking to sports-focused angels, micro-VCs, and operators who believe in this mission. Reach out to schedule 30 minutes.</p>
-  <div class="inv-contact" id="invForm">
-    <input class="ic-input" type="text" placeholder="Your name & fund / firm" id="invName">
-    <input class="ic-input" type="email" placeholder="Email address" id="invEmail">
-    <input class="ic-input" type="text" placeholder="Investment focus / check size" id="invFocus">
-    <button class="ic-btn" onclick="submitInv()">REQUEST A MEETING →</button>
-  </div>
+  <form class="inv-contact" id="invForm" onsubmit="submitLead(event)">
+    <input class="ic-input" type="text" placeholder="First name" id="invFirstName" required>
+    <input class="ic-input" type="text" placeholder="Last name" id="invLastName" required>
+    <input class="ic-input" type="email" placeholder="Email address" id="invEmail" required>
+    <input class="ic-input" type="text" placeholder="Company / Organization" id="invCompany" required>
+    <input class="ic-input" type="tel" placeholder="Phone number" id="invPhone">
+    <select class="ic-input" id="invType" style="appearance:none;cursor:pointer;color:rgba(255,255,255,0.25)"><option value="">I am a...</option><option>Individual / Family</option><option>School / District Administrator</option><option>Property Manager / HOA</option><option>City / Parks & Rec</option><option>Corporate / Event Organizer</option><option>Sports Equipment Manufacturer</option><option>Investor</option><option>Nonprofit</option></select>
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAACwbsK0UG6DKDEn2" data-theme="dark"></div>
+    <button class="ic-btn" type="submit" id="invBtn">REQUEST A MEETING →</button>
+  </form>
   <div class="ic-success" id="invSuccess">✓ REQUEST RECEIVED — WE'LL BE IN TOUCH WITHIN 24 HOURS.</div>
 </div>
 
@@ -485,6 +489,7 @@ footer{background:#030303;padding:32px 8vw;display:flex;justify-content:space-be
   <div class="fn">Confidential · For Accredited Investors Only · Not an Offer to Sell Securities · sandlotsport.com · 2026</div>
 </footer>
 
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
 if(sessionStorage.getItem('sl_auth')==='1'){document.getElementById('gate').style.display='none';}
 function checkPW(){
@@ -493,13 +498,33 @@ function checkPW(){
     document.getElementById('gate').style.display='none';
   } else {document.getElementById('pwErr').style.display='block';}
 }
-document.addEventListener('keydown',function(e){if(e.key==='Enter')checkPW();});
-function submitInv(){
-  const n=document.getElementById('invName').value;
-  const e=document.getElementById('invEmail').value;
-  if(!n||!e){alert('Please fill in your name and email.');return;}
-  document.getElementById('invForm').style.display='none';
-  document.getElementById('invSuccess').style.display='block';
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&document.getElementById('gate').style.display!=='none')checkPW();});
+function submitLead(e){
+  e.preventDefault();
+  var token=document.querySelector('[name="cf-turnstile-response"]');
+  if(!token||!token.value){alert('Please complete the CAPTCHA verification.');return;}
+  var btn=document.getElementById('invBtn');
+  btn.textContent='SUBMITTING...';btn.disabled=true;
+  fetch('/api/lead',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      first_name:document.getElementById('invFirstName').value,
+      last_name:document.getElementById('invLastName').value,
+      email:document.getElementById('invEmail').value,
+      company:document.getElementById('invCompany').value,
+      phone:document.getElementById('invPhone').value,
+      lead_type:document.getElementById('invType').value,
+      source_page:'investor',
+      turnstile_token:token.value
+    })
+  })
+  .then(function(r){if(!r.ok)throw new Error('fail');
+    document.getElementById('invForm').style.display='none';
+    document.getElementById('invSuccess').style.display='block';
+  })
+  .catch(function(){alert('Something went wrong. Please try again.');if(window.turnstile)turnstile.reset();})
+  .finally(function(){btn.textContent='REQUEST A MEETING →';btn.disabled=false;});
 }
 </script>
 </body>
