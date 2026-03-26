@@ -317,13 +317,16 @@ footer{background:var(--ink);padding:40px 8vw;display:flex;justify-content:space
 <div class="pilot-strip" id="contact">
   <h2>START YOUR<br>PILOT TODAY.</h2>
   <p>We'll put together a custom proposal for your city — including park coverage maps, projected participation numbers, and grant-language templates — within 5 business days.</p>
-  <div class="cta-form" id="ctaForm">
-    <input class="cta-input" type="text" placeholder="Your name & title" id="ctaName">
-    <input class="cta-input" type="text" placeholder="City & State" id="ctaCity">
-    <input class="cta-input" type="text" placeholder="Population / number of parks" id="ctaSize">
-    <input class="cta-input" type="email" placeholder="Government email address" id="ctaEmail">
-    <button class="cta-btn" onclick="submitForm()">REQUEST CITY PROPOSAL →</button>
-  </div>
+  <form class="cta-form" id="ctaForm" onsubmit="submitLead(event)">
+    <input class="cta-input" type="text" placeholder="First name" id="ctaFirstName" required>
+    <input class="cta-input" type="text" placeholder="Last name" id="ctaLastName" required>
+    <input class="cta-input" type="email" placeholder="Email address" id="ctaEmail" required>
+    <input class="cta-input" type="text" placeholder="Company / Organization" id="ctaCompany" required>
+    <input class="cta-input" type="tel" placeholder="Phone number" id="ctaPhone">
+    <select class="cta-input" id="ctaType" style="appearance:none;cursor:pointer"><option value="">I am a...</option><option>Individual / Family</option><option>School / District Administrator</option><option>Property Manager / HOA</option><option>City / Parks & Rec</option><option>Corporate / Event Organizer</option><option>Sports Equipment Manufacturer</option><option>Investor</option><option>Nonprofit</option></select>
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAACwbsK0UG6DKDEn2" data-theme="dark"></div>
+    <button class="cta-btn" type="submit" id="ctaBtn">REQUEST CITY PROPOSAL →</button>
+  </form>
   <div class="cta-success" id="ctaSuccess">✓ REQUEST RECEIVED — OUR CITY PARTNERSHIPS TEAM WILL BE IN TOUCH WITHIN 5 BUSINESS DAYS.</div>
 </div>
 
@@ -338,6 +341,7 @@ footer{background:var(--ink);padding:40px 8vw;display:flex;justify-content:space
   </div>
 </footer>
 
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
 if(sessionStorage.getItem('sl_auth')==='1'){document.getElementById('gate').style.display='none';}
 function checkPW(){
@@ -346,13 +350,33 @@ function checkPW(){
     document.getElementById('gate').style.display='none';
   } else {document.getElementById('pwErr').style.display='block';}
 }
-document.addEventListener('keydown',function(e){if(e.key==='Enter')checkPW();});
-function submitForm(){
-  const n=document.getElementById('ctaName').value;
-  const e=document.getElementById('ctaEmail').value;
-  if(!n||!e){alert('Please fill in your name and email.');return;}
-  document.getElementById('ctaForm').style.display='none';
-  document.getElementById('ctaSuccess').style.display='block';
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&document.getElementById('gate').style.display!=='none')checkPW();});
+function submitLead(e){
+  e.preventDefault();
+  var token=document.querySelector('[name="cf-turnstile-response"]');
+  if(!token||!token.value){alert('Please complete the CAPTCHA verification.');return;}
+  var btn=document.getElementById('ctaBtn');
+  btn.textContent='SUBMITTING...';btn.disabled=true;
+  fetch('/api/lead',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      first_name:document.getElementById('ctaFirstName').value,
+      last_name:document.getElementById('ctaLastName').value,
+      email:document.getElementById('ctaEmail').value,
+      company:document.getElementById('ctaCompany').value,
+      phone:document.getElementById('ctaPhone').value,
+      lead_type:document.getElementById('ctaType').value,
+      source_page:'cities',
+      turnstile_token:token.value
+    })
+  })
+  .then(function(r){if(!r.ok)throw new Error('fail');
+    document.getElementById('ctaForm').style.display='none';
+    document.getElementById('ctaSuccess').style.display='block';
+  })
+  .catch(function(){alert('Something went wrong. Please try again.');if(window.turnstile)turnstile.reset();})
+  .finally(function(){btn.textContent='REQUEST CITY PROPOSAL →';btn.disabled=false;});
 }
 </script>
 </body>

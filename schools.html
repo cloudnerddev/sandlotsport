@@ -300,22 +300,26 @@ footer{background:rgba(0,0,0,0.8);padding:40px 8vw;display:flex;justify-content:
 <section class="cta" id="contact">
   <h2>LET'S BUILD<br>YOUR SCHOOL'S<br><span>PROGRAM.</span></h2>
   <p>Share a few details and we'll put together a custom proposal — including grant language, sample schedules, and per-student cost breakdowns.</p>
-  <div class="cta-form" id="ctaForm">
-    <input class="cta-input" type="text" placeholder="Your name & title" id="ctaName">
-    <input class="cta-input" type="text" placeholder="School or district name" id="ctaSchool">
-    <input class="cta-input" type="text" placeholder="City & State" id="ctaCity">
-    <input class="cta-input" type="text" placeholder="Approximate student enrollment" id="ctaEnroll">
+  <form class="cta-form" id="ctaForm" onsubmit="submitLead(event)">
+    <input class="cta-input" type="text" placeholder="First name" id="ctaFirstName" required>
+    <input class="cta-input" type="text" placeholder="Last name" id="ctaLastName" required>
+    <input class="cta-input" type="email" placeholder="Email address" id="ctaEmail" required>
+    <input class="cta-input" type="text" placeholder="Company / Organization" id="ctaCompany" required>
+    <input class="cta-input" type="tel" placeholder="Phone number" id="ctaPhone">
     <select class="cta-select" id="ctaType">
-      <option value="">I represent a...</option>
-      <option>Single school</option>
-      <option>School district</option>
-      <option>Charter school / network</option>
-      <option>After-school program provider</option>
-      <option>Nonprofit / community org</option>
+      <option value="">I am a...</option>
+      <option>Individual / Family</option>
+      <option>School / District Administrator</option>
+      <option>Property Manager / HOA</option>
+      <option>City / Parks & Rec</option>
+      <option>Corporate / Event Organizer</option>
+      <option>Sports Equipment Manufacturer</option>
+      <option>Investor</option>
+      <option>Nonprofit</option>
     </select>
-    <input class="cta-input" type="email" placeholder="School / district email" id="ctaEmail">
-    <button class="cta-btn" onclick="submitForm()">REQUEST SCHOOL PROPOSAL →</button>
-  </div>
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAACwbsK0UG6DKDEn2" data-theme="dark"></div>
+    <button class="cta-btn" type="submit" id="ctaBtn">REQUEST SCHOOL PROPOSAL →</button>
+  </form>
   <div class="cta-success" id="ctaSuccess">✓ REQUEST RECEIVED — WE'LL HAVE YOUR CUSTOM PROPOSAL READY WITHIN 5 BUSINESS DAYS.</div>
 </section>
 
@@ -330,6 +334,7 @@ footer{background:rgba(0,0,0,0.8);padding:40px 8vw;display:flex;justify-content:
   </div>
 </footer>
 
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
 if(sessionStorage.getItem('sl_auth')==='1'){document.getElementById('gate').style.display='none';}
 function checkPW(){
@@ -338,13 +343,33 @@ function checkPW(){
     document.getElementById('gate').style.display='none';
   } else {document.getElementById('pwErr').style.display='block';}
 }
-document.addEventListener('keydown',function(e){if(e.key==='Enter')checkPW();});
-function submitForm(){
-  const n=document.getElementById('ctaName').value;
-  const e=document.getElementById('ctaEmail').value;
-  if(!n||!e){alert('Please fill in your name and email.');return;}
-  document.getElementById('ctaForm').style.display='none';
-  document.getElementById('ctaSuccess').style.display='block';
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&document.getElementById('gate').style.display!=='none')checkPW();});
+function submitLead(e){
+  e.preventDefault();
+  var token=document.querySelector('[name="cf-turnstile-response"]');
+  if(!token||!token.value){alert('Please complete the CAPTCHA verification.');return;}
+  var btn=document.getElementById('ctaBtn');
+  btn.textContent='SUBMITTING...';btn.disabled=true;
+  fetch('/api/lead',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      first_name:document.getElementById('ctaFirstName').value,
+      last_name:document.getElementById('ctaLastName').value,
+      email:document.getElementById('ctaEmail').value,
+      company:document.getElementById('ctaCompany').value,
+      phone:document.getElementById('ctaPhone').value,
+      lead_type:document.getElementById('ctaType').value,
+      source_page:'schools',
+      turnstile_token:token.value
+    })
+  })
+  .then(function(r){if(!r.ok)throw new Error('fail');
+    document.getElementById('ctaForm').style.display='none';
+    document.getElementById('ctaSuccess').style.display='block';
+  })
+  .catch(function(){alert('Something went wrong. Please try again.');if(window.turnstile)turnstile.reset();})
+  .finally(function(){btn.textContent='REQUEST SCHOOL PROPOSAL →';btn.disabled=false;});
 }
 </script>
 </body>

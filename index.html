@@ -367,10 +367,12 @@ footer{background:var(--ink);padding:60px 8vw 32px;color:rgba(255,255,255,0.5)}
     <div>
       <div class="eyebrow">Join the Waitlist</div>
       <div class="section-title" style="font-size:clamp(36px,4vw,52px);margin-bottom:8px">YOUR SPORT<br><span class="accent">IS WAITING.</span></div>
-      <div class="wl-form" id="wlForm">
-        <input class="wl-input" type="text" placeholder="Your name" id="wlName">
-        <input class="wl-input" type="email" placeholder="Email address" id="wlEmail">
-        <input class="wl-input" type="text" placeholder="City, State" id="wlCity">
+      <form class="wl-form" id="wlForm" onsubmit="submitLead(event)">
+        <input class="wl-input" type="text" placeholder="First name" id="wlFirstName" required>
+        <input class="wl-input" type="text" placeholder="Last name" id="wlLastName" required>
+        <input class="wl-input" type="email" placeholder="Email address" id="wlEmail" required>
+        <input class="wl-input" type="text" placeholder="Company / Organization" id="wlCompany" required>
+        <input class="wl-input" type="tel" placeholder="Phone number" id="wlPhone">
         <select class="wl-select" id="wlType">
           <option value="">I am a...</option>
           <option>Individual / Family</option>
@@ -378,10 +380,13 @@ footer{background:var(--ink);padding:60px 8vw 32px;color:rgba(255,255,255,0.5)}
           <option>Property Manager / HOA</option>
           <option>City / Parks & Rec</option>
           <option>Corporate / Event Organizer</option>
+          <option>Sports Equipment Manufacturer</option>
+          <option>Investor</option>
           <option>Nonprofit</option>
         </select>
-        <button class="wl-btn" onclick="submitWaitlist()">JOIN THE WAITLIST →</button>
-      </div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAACwbsK0UG6DKDEn2" data-theme="dark"></div>
+        <button class="wl-btn" type="submit" id="wlBtn">JOIN THE WAITLIST →</button>
+      </form>
       <div class="wl-success" id="wlSuccess">✓ YOU'RE ON THE LIST. WE'LL BE IN TOUCH SOON.</div>
       <p style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.3);font-family:'Space Mono',monospace">No spam. No fees to join the list. Just first access.</p>
     </div>
@@ -418,13 +423,34 @@ footer{background:var(--ink);padding:60px 8vw 32px;color:rgba(255,255,255,0.5)}
   </div>
 </footer>
 
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
-function submitWaitlist(){
-  const n=document.getElementById('wlName').value;
-  const e=document.getElementById('wlEmail').value;
-  if(!n||!e){alert('Please enter your name and email.');return;}
-  document.getElementById('wlForm').style.display='none';
-  document.getElementById('wlSuccess').style.display='block';
+function submitLead(e){
+  e.preventDefault();
+  var token=document.querySelector('[name="cf-turnstile-response"]');
+  if(!token||!token.value){alert('Please complete the CAPTCHA verification.');return;}
+  var btn=document.getElementById('wlBtn');
+  btn.textContent='SUBMITTING...';btn.disabled=true;
+  fetch('/api/lead',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      first_name:document.getElementById('wlFirstName').value,
+      last_name:document.getElementById('wlLastName').value,
+      email:document.getElementById('wlEmail').value,
+      company:document.getElementById('wlCompany').value,
+      phone:document.getElementById('wlPhone').value,
+      lead_type:document.getElementById('wlType').value,
+      source_page:'homepage',
+      turnstile_token:token.value
+    })
+  })
+  .then(function(r){if(!r.ok)throw new Error('fail');
+    document.getElementById('wlForm').style.display='none';
+    document.getElementById('wlSuccess').style.display='block';
+  })
+  .catch(function(){alert('Something went wrong. Please try again.');if(window.turnstile)turnstile.reset();})
+  .finally(function(){btn.textContent='JOIN THE WAITLIST →';btn.disabled=false;});
 }
 </script>
 </body>
