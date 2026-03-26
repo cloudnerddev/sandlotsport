@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandlot — Manufacturer Partnership</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#1a3a5c;--lime:#a8e63d;--chalk:#f5f0e8;--grass:#2d5016;--dirt:#c4832a;--ink:#0f0f0f;--mid:#5a5a5a;--white:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--white);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden}
+
+/* PASSWORD GATE */
+#gate{position:fixed;inset:0;background:var(--ink);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.gate-logo{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--lime);line-height:1}
+.gate-sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:48px}
+.gate-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:10px;text-align:left;width:320px}
+.gate-input{width:320px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:16px;color:white;outline:none;letter-spacing:4px;text-align:center}
+.gate-input:focus{border-color:var(--lime)}
+.gate-btn{width:320px;margin-top:12px;background:var(--lime);color:var(--ink);padding:16px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;border:none;cursor:pointer;transition:opacity .2s}
+.gate-btn:hover{opacity:.85}
+.gate-err{width:320px;margin-top:10px;font-family:'Space Mono',monospace;font-size:11px;color:#e74c3c;letter-spacing:1px;display:none;text-align:center}
+.gate-back{margin-top:24px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.25);text-decoration:none;text-transform:uppercase}
+.gate-back:hover{color:rgba(255,255,255,0.5)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 6vw;height:64px;background:rgba(15,15,15,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.06)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--lime);text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{color:rgba(255,255,255,0.5);text-decoration:none;font-size:13px;transition:color .2s}
+.nav-links a:hover{color:var(--lime)}
+.nav-cta{background:var(--lime);color:var(--ink)!important;padding:8px 20px;font-weight:600}
+
+/* HERO */
+.mfr-hero{min-height:100vh;background:var(--ink);display:flex;flex-direction:column;justify-content:center;padding:120px 8vw 80px;position:relative;overflow:hidden}
+.mfr-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 50%,rgba(168,230,61,0.04) 0%,transparent 70%)}
+.hero-pct-wrap{display:grid;grid-template-columns:auto 1fr;gap:64px;align-items:center;margin-bottom:80px}
+.hero-pct{font-family:'Bebas Neue',sans-serif;font-size:clamp(160px,22vw,280px);color:var(--lime);line-height:.85;letter-spacing:-4px}
+.hero-pct-right h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,64px);color:var(--white);line-height:1;margin-bottom:20px}
+.hero-pct-right p{font-size:18px;color:rgba(255,255,255,0.6);max-width:520px;line-height:1.75}
+.hero-pct-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px}
+
+/* CRISIS SECTION */
+.section{padding:96px 8vw}
+.eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;color:var(--lime);opacity:.8}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,6vw,80px);line-height:.95;margin-bottom:40px}
+.prose{max-width:680px;font-size:16px;line-height:1.8;color:rgba(255,255,255,0.65)}
+.accent{color:var(--lime)}
+
+.crisis-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:48px}
+.crisis-block{padding:48px 40px;background:rgba(255,255,255,0.03)}
+.crisis-num{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--lime);line-height:1;margin-bottom:8px}
+.crisis-block h3{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--white);margin-bottom:10px}
+.crisis-block p{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7}
+
+/* MATH SECTION */
+.math-wrap{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:56px 48px;margin-top:56px}
+.math-intro{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:32px}
+.math-table{width:100%;border-collapse:collapse}
+.math-table th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;text-align:right;padding:10px 16px;border-bottom:2px solid rgba(168,230,61,0.2);color:rgba(255,255,255,0.35)}
+.math-table th:first-child{text-align:left}
+.math-table td{padding:14px 16px;font-size:14px;text-align:right;border-bottom:1px solid rgba(255,255,255,0.04);color:rgba(255,255,255,0.65)}
+.math-table td:first-child{text-align:left;color:var(--white);font-weight:500}
+.math-table tr:last-child td{color:var(--lime);font-weight:700;font-size:16px;border-bottom:none;background:rgba(168,230,61,0.05)}
+.math-callout{margin-top:24px;padding:20px 24px;background:rgba(168,230,61,0.08);border-left:4px solid var(--lime);font-size:14px;color:rgba(255,255,255,0.7);line-height:1.7}
+.math-callout strong{color:var(--lime)}
+
+/* DEAL SECTION */
+.deal-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin-top:48px}
+.deal-block{padding:40px 32px;position:relative}
+.deal-give{background:rgba(168,230,61,0.08);border-top:3px solid var(--lime)}
+.deal-get{background:rgba(26,58,92,0.4);border-top:3px solid var(--sky)}
+.deal-earn{background:rgba(196,131,42,0.15);border-top:3px solid var(--dirt)}
+.deal-header{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px}
+.deal-give .deal-header{color:var(--lime)}
+.deal-get .deal-header{color:rgba(255,255,255,0.5)}
+.deal-earn .deal-header{color:var(--dirt)}
+.deal-block h3{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);margin-bottom:12px}
+.deal-block ul{list-style:none;font-size:13px;color:rgba(255,255,255,0.6);line-height:2.1}
+.deal-block ul li::before{content:'→  '}
+
+/* LTV SECTION */
+.ltv-highlight{background:var(--lime);padding:72px 8vw;text-align:center}
+.ltv-big{font-family:'Bebas Neue',sans-serif;font-size:clamp(80px,14vw,160px);color:var(--grass);line-height:.9}
+.ltv-sub{font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,4vw,44px);color:var(--sky);margin-top:8px}
+.ltv-desc{font-size:18px;color:var(--grass);max-width:600px;margin:20px auto 0;font-style:italic;font-weight:300}
+
+/* PITCH QUOTE */
+.pitch-section{background:rgba(26,58,92,0.4);border-left:6px solid var(--lime);padding:56px 48px;margin:0 8vw}
+.pitch-quote{font-size:clamp(18px,2.5vw,24px);color:rgba(255,255,255,0.9);line-height:1.7;font-style:italic}
+.pitch-quote strong{color:var(--lime);font-style:normal}
+
+/* WHAT WE OFFER */
+.offer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:3px;margin-top:48px}
+.offer-block{padding:36px 32px;background:rgba(255,255,255,0.03);border-bottom:3px solid transparent;transition:border-color .2s}
+.offer-block:hover{border-color:var(--lime);background:rgba(168,230,61,0.04)}
+.offer-icon{font-size:28px;margin-bottom:16px}
+.offer-block h4{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--lime);margin-bottom:8px}
+.offer-block p{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.65}
+
+/* SPORTS TABLE */
+.eq-table{width:100%;border-collapse:collapse;margin-top:40px}
+.eq-table th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;text-align:left;padding:12px 16px;border-bottom:2px solid rgba(168,230,61,0.2);color:var(--lime)}
+.eq-table td{padding:14px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);vertical-align:top}
+.eq-table tr:hover td{background:rgba(168,230,61,0.03)}
+.eq-sport{font-weight:600;color:var(--white);font-size:14px}
+
+/* CTA */
+.cta-section{background:var(--lime);padding:96px 8vw;text-align:center}
+.cta-section h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,100px);color:var(--grass);line-height:.9;margin-bottom:24px}
+.cta-form{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:480px;margin:0 auto}
+.cta-input{width:100%;background:rgba(0,0,0,0.1);border:2px solid rgba(0,0,0,0.15);padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--ink);outline:none}
+.cta-input::placeholder{color:rgba(0,0,0,0.4)}
+.cta-input:focus{border-color:var(--grass)}
+.cta-btn{width:100%;background:var(--grass);color:white;padding:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;border:none;cursor:pointer;transition:opacity .2s}
+.cta-btn:hover{opacity:.85}
+.cta-sub{font-size:13px;color:rgba(0,0,0,0.4);font-family:'Space Mono',monospace;letter-spacing:1px}
+.cta-success{display:none;padding:20px;background:rgba(45,80,22,0.15);border:2px solid var(--grass);color:var(--grass);font-family:'Space Mono',monospace;font-size:13px;letter-spacing:1px;text-align:center;width:100%;max-width:480px;margin:0 auto}
+
+footer{background:rgba(0,0,0,0.5);padding:40px 8vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;border-top:1px solid rgba(255,255,255,0.06)}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--lime)}
+.footer-note{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2)}
+
+.chalk-divider{height:3px;background:repeating-linear-gradient(90deg,var(--lime),var(--lime) 24px,transparent 24px,transparent 36px);opacity:.2}
+@media(max-width:768px){
+  .hero-pct-wrap{grid-template-columns:1fr}
+  .hero-pct{font-size:clamp(120px,30vw,160px)}
+  .crisis-grid,.deal-row{grid-template-columns:1fr}
+  .pitch-section{margin:0 4vw;padding:36px 28px}
+}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="gate">
+  <div class="gate-logo">SANDLOT</div>
+  <div class="gate-sub">Manufacturer Partner Portal</div>
+  <div class="gate-label">Enter Access Password</div>
+  <input class="gate-input" type="password" id="pwInput" placeholder="••••••••••" autocomplete="off">
+  <button class="gate-btn" onclick="checkPW()">ENTER →</button>
+  <div class="gate-err" id="pwErr">INCORRECT PASSWORD. CONTACT YOUR SANDLOT REPRESENTATIVE.</div>
+  <a href="index.html" class="gate-back">← Back to sandlotsport.com</a>
+</div>
+
+<nav>
+  <a class="nav-logo" href="index.html">SANDLOT</a>
+  <div class="nav-links">
+    <a href="#crisis">The Problem</a>
+    <a href="#math">The Numbers</a>
+    <a href="#deal">The Deal</a>
+    <a href="#sports">Sport Categories</a>
+    <a href="#contact" class="nav-cta">Partner With Us</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="mfr-hero">
+  <div class="hero-pct-wrap">
+    <div>
+      <div class="hero-pct-label">Of American Kids</div>
+      <div class="hero-pct">70%</div>
+    </div>
+    <div class="hero-pct-right">
+      <h1>QUIT SPORTS BEFORE<br>THEY EVER BUY<br>YOUR PRODUCT.</h1>
+      <p>The youth sports dropout crisis isn't just a public health problem. It is a direct, measurable threat to the lifetime revenue pipeline of every sports equipment brand in America. Sandlot is the only solution built to fix it — at scale.</p>
+    </div>
+  </div>
+</section>
+
+<div class="chalk-divider"></div>
+
+<!-- CRISIS -->
+<section class="section" id="crisis">
+  <div class="eyebrow">The Crisis</div>
+  <div class="section-title">YOUR PIPELINE<br>IS <span class="accent">QUITTING.</span></div>
+  <p class="prose">Seven out of ten kids who should be falling in love with your product — and buying it for the next 40 years — walk away from sports before they're old enough to have a credit card. The average child today quits by age 11. Less than three years of participation. No brand loyalty ever formed.</p>
+
+  <div class="crisis-grid">
+    <div class="crisis-block">
+      <div class="crisis-num">70%</div>
+      <h3>Quit Before Age 13</h3>
+      <p>The National Alliance for Youth Sports reports 70% of American kids abandon organized sports by 13. The #1 reason: "It's just not fun anymore." Pressure. Cost. Intimidation. The joy is gone — and with it, your future customer.</p>
+    </div>
+    <div class="crisis-block">
+      <div class="crisis-num">Age 11</div>
+      <h3>Average Quit Age</h3>
+      <p>Aspen Institute data shows the average child now quits sports by age 11 — down from age 13 a decade ago. The window is closing faster every year. Traditional advertising can't fix a participation problem.</p>
+    </div>
+    <div class="crisis-block">
+      <div class="crisis-num">-7pts</div>
+      <h3>Decade-Long Decline</h3>
+      <p>Youth sports participation dropped from 45% to 38% of kids ages 6–12 in just one decade. Girls quit at twice the rate of boys by age 14. The market is actively shrinking.</p>
+    </div>
+    <div class="crisis-block">
+      <div class="crisis-num">$2K+</div>
+      <h3>LTV of a Retained Player</h3>
+      <p>A player who stays in the sport through adulthood doesn't buy one paddle. They buy 8–12 over their lifetime — plus shoes, bags, balls, apparel, and accessories. The lifetime value of one retained youth participant: $2,000–$8,000 in direct product purchases.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PITCH QUOTE -->
+<div class="pitch-section">
+  <p class="pitch-quote">"You can't sell a $150 paddle to a 14-year-old who stopped playing at 11. <strong>Every kid who quits is a lifetime customer you will never have.</strong> Sandlot is the only platform built to solve that problem — and we can prove the ROI down to the dollar."</p>
+</div>
+
+<!-- THE MATH -->
+<section class="section" id="math">
+  <div class="eyebrow">The Revenue Opportunity</div>
+  <div class="section-title">WHAT A 2% LIFT IN<br><span class="accent">PARTICIPATION</span><br>IS WORTH TO YOU.</div>
+  <p class="prose">If Sandlot increases sports participation by just 2% across a city population — a conservative estimate — here's what that generates in new equipment sales per year. We use a $200/year equipment spend figure, well below the Project Play average of $693/child/year.</p>
+
+  <div class="math-wrap">
+    <div class="math-intro">2% Participation Lift — New Equipment Revenue by Market (@ $200/player/year)</div>
+    <table class="math-table">
+      <thead>
+        <tr>
+          <th style="text-align:left">City</th>
+          <th>Population</th>
+          <th>+2% Players</th>
+          <th>Avg. Equip Spend</th>
+          <th>New Revenue</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Austin, TX</td><td>1,000,000</td><td>20,000</td><td>$200</td><td>$4,000,000</td></tr>
+        <tr><td>San Antonio, TX</td><td>1,450,000</td><td>29,000</td><td>$200</td><td>$5,800,000</td></tr>
+        <tr><td>Houston, TX</td><td>2,400,000</td><td>48,000</td><td>$200</td><td>$9,600,000</td></tr>
+        <tr><td>Dallas, TX</td><td>1,300,000</td><td>26,000</td><td>$200</td><td>$5,200,000</td></tr>
+        <tr><td>Phoenix, AZ</td><td>1,600,000</td><td>32,000</td><td>$200</td><td>$6,400,000</td></tr>
+        <tr><td>Charlotte, NC</td><td>950,000</td><td>19,000</td><td>$200</td><td>$3,800,000</td></tr>
+        <tr><td style="font-size:16px;color:var(--lime)">Top 20 U.S. Markets</td><td>~40,000,000</td><td>800,000</td><td>$200</td><td>$160,000,000</td></tr>
+      </tbody>
+    </table>
+    <div class="math-callout">
+      <strong>For a brand holding 15% market share:</strong> a 2% participation lift across our top 20 markets = <strong>$24–30M in new attributable annual equipment revenue</strong>. From a demo set that costs you nothing to provide. Your marketing team has never seen a cost-per-acquisition like this.
+    </div>
+  </div>
+</section>
+
+<!-- LTV BANNER -->
+<div class="ltv-highlight">
+  <div class="ltv-big">$2,000–<br>$8,000</div>
+  <div class="ltv-sub">Lifetime Equipment Value of One Retained Player</div>
+  <p class="ltv-desc">Don't just measure the coupon redemption. Measure the 40-year customer you just created.</p>
+</div>
+
+<!-- THE DEAL -->
+<section class="section" id="deal">
+  <div class="eyebrow">Partnership Structure</div>
+  <div class="section-title">THE DEAL IS<br><span class="accent">SIMPLE.</span></div>
+  <p class="prose">Zero cash required from you. We structure every manufacturer partnership as a performance-based exchange — you provide demo equipment, we deliver documented new customers and measurable sales lift.</p>
+
+  <div class="deal-row">
+    <div class="deal-block deal-give">
+      <div class="deal-header">You Provide</div>
+      <h3>Demo Equipment</h3>
+      <ul>
+        <li>One demo set per truck in your category</li>
+        <li>Replaced on your manufacturer refresh cycle</li>
+        <li>Zero cash investment required</li>
+        <li>Equipment stays in pristine condition — showcased, not destroyed</li>
+        <li>Exclusive brand placement per sport category per city</li>
+      </ul>
+    </div>
+    <div class="deal-block deal-get">
+      <div class="deal-header">You Get</div>
+      <h3>Verified Exposure</h3>
+      <ul>
+        <li>Your product in the hands of real, new players</li>
+        <li>Post-session personalized retail offer to every participant</li>
+        <li>Coupon redemption tracking & purchase conversion data</li>
+        <li>Co-branded Sandlot activation events</li>
+        <li>Demographics + sport engagement analytics</li>
+        <li>Category exclusivity in your partnership markets</li>
+      </ul>
+    </div>
+    <div class="deal-block deal-earn">
+      <div class="deal-header">Sandlot Earns</div>
+      <h3>Revenue Share</h3>
+      <ul>
+        <li>$1–3 per activated coupon redemption</li>
+        <li>Co-marketing fee for brand placement</li>
+        <li>At 1M members: $12–36M/year in partner revenue</li>
+        <li>Sandlot invests this in more trucks, more markets, more players for you</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE OFFER -->
+<section class="section" style="padding-top:0">
+  <div class="eyebrow">Our Platform</div>
+  <div class="section-title">WHAT SANDLOT<br><span class="accent">DELIVERS</span></div>
+  <div class="offer-grid">
+    <div class="offer-block">
+      <div class="offer-icon">📱</div>
+      <h4>Post-Session Coupon Engine</h4>
+      <p>AI determines the highest-converting offer for each participant based on age, sport, engagement, and purchase intent. Push notifications go out within 90 seconds of session end.</p>
+    </div>
+    <div class="offer-block">
+      <div class="offer-icon">📊</div>
+      <h4>Purchase Attribution Data</h4>
+      <p>Full funnel tracking from demo touch → coupon open → click → purchase. The attribution data your marketing team has been asking for, finally tied to physical product trials.</p>
+    </div>
+    <div class="offer-block">
+      <div class="offer-icon">🎯</div>
+      <h4>Category Exclusivity</h4>
+      <p>One brand per sport category per city. If you're our pickleball partner in Austin, no other paddle brand touches an Austin Sandlot truck. Your gear. Your market.</p>
+    </div>
+    <div class="offer-block">
+      <div class="offer-icon">👥</div>
+      <h4>Demographic Targeting</h4>
+      <p>Access to participation data segmented by age, income, zip code, sport preference, and session frequency. Inform product development and media buying with real behavioral data.</p>
+    </div>
+    <div class="offer-block">
+      <div class="offer-icon">🚛</div>
+      <h4>Field Marketing at Scale</h4>
+      <p>At 250 trucks across 50 cities, Sandlot is the largest field marketing operation in youth sports. Your brand appears at thousands of events per year, in communities that stadium ads never reach.</p>
+    </div>
+    <div class="offer-block">
+      <div class="offer-icon">📣</div>
+      <h4>Co-Branded Content</h4>
+      <p>Every Sandlot event generates social content. Game managers capture sessions, participants share highlights. Your brand is visible in organic, authentic community sports content — not paid placements.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SPORTS TABLE -->
+<section class="section" style="padding-top:0" id="sports">
+  <div class="eyebrow">Available Categories</div>
+  <div class="section-title">FIND YOUR<br><span class="accent">SPORT.</span></div>
+  <table class="eq-table">
+    <thead>
+      <tr><th>Sport Category</th><th>Equipment Per Truck</th><th>Primary Mechanism</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="eq-sport">🏓 Pickleball</td><td>20 paddles, 60 balls, 2 nets</td><td>Post-session upgrade coupon</td><td style="color:var(--lime)">Open — First Launch</td></tr>
+      <tr><td class="eq-sport">🏐 Volleyball</td><td>8 balls, 2 nets, boundaries</td><td>Retail partner discount</td><td style="color:var(--lime)">Open — First Launch</td></tr>
+      <tr><td class="eq-sport">🏈 Flag Football</td><td>24 belts, 6 balls, cones</td><td>League registration offer</td><td style="color:var(--lime)">Open — First Launch</td></tr>
+      <tr><td class="eq-sport">🎾 Tennis / Paddle</td><td>20 rackets, 100 balls, net</td><td>Free ball can at retail partner</td><td style="color:var(--lime)">Open</td></tr>
+      <tr><td class="eq-sport">⚽ Soccer</td><td>12 balls, mini goals, cones</td><td>Boot trial discount</td><td style="color:var(--lime)">Open</td></tr>
+      <tr><td class="eq-sport">🏀 Basketball</td><td>12 balls, rebounder, aids</td><td>App-push to gear store</td><td style="color:var(--lime)">Open</td></tr>
+      <tr><td class="eq-sport">🥏 Disc Sports</td><td>30 discs, baskets, targets</td><td>$5 off first disc</td><td style="color:var(--lime)">Open</td></tr>
+      <tr><td class="eq-sport">🎪 Spikeball / Lawn</td><td>4 sets, accessories</td><td>Promo code push post-session</td><td style="color:var(--lime)">Open</td></tr>
+      <tr><td class="eq-sport">🏃 Agility / Training</td><td>Ladders, hurdles, cones</td><td>Training plan upsell</td><td style="color:var(--lime)">Open</td></tr>
+      <tr><td class="eq-sport">🧘 Yoga / Wellness</td><td>30 mats, blocks, straps</td><td>Studio trial or mat offer</td><td style="color:var(--lime)">Open</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <h2>READY TO STOP<br>LOSING CUSTOMERS?</h2>
+  <p style="font-size:18px;color:var(--grass);margin-bottom:40px;max-width:520px;margin-left:auto;margin-right:auto">Tell us your brand and sport category. We'll send over our full partnership deck and schedule a 30-minute call with our partnerships team.</p>
+  <div class="cta-form" id="ctaForm">
+    <input class="cta-input" type="text" placeholder="Your name & title" id="ctaName">
+    <input class="cta-input" type="text" placeholder="Brand / Company" id="ctaBrand">
+    <input class="cta-input" type="email" placeholder="Business email" id="ctaEmail">
+    <input class="cta-input" type="text" placeholder="Sport category (e.g. Pickleball, Soccer)" id="ctaSport">
+    <button class="cta-btn" onclick="submitMfr()">REQUEST PARTNERSHIP DECK →</button>
+    <p class="cta-sub">Category exclusivity is first-come. Austin & Texas markets filling now.</p>
+  </div>
+  <div class="cta-success" id="ctaSuccess">✓ REQUEST RECEIVED — OUR PARTNERSHIPS TEAM WILL BE IN TOUCH WITHIN 48 HOURS.</div>
+</section>
+
+<footer>
+  <div class="footer-logo">SANDLOT</div>
+  <div class="footer-note">Confidential · Manufacturer Partner Portal · sandlotsport.com</div>
+</footer>
+
+<script>
+// AUTH
+if(sessionStorage.getItem('sl_auth')==='1'){document.getElementById('gate').style.display='none';}
+function checkPW(){
+  if(document.getElementById('pwInput').value==='SANDLOT25'){
+    sessionStorage.setItem('sl_auth','1');
+    document.getElementById('gate').style.display='none';
+  } else {
+    document.getElementById('pwErr').style.display='block';
+  }
+}
+document.addEventListener('keydown',function(e){if(e.key==='Enter')checkPW();});
+
+function submitMfr(){
+  const n=document.getElementById('ctaName').value;
+  const e=document.getElementById('ctaEmail').value;
+  if(!n||!e){alert('Please fill in your name and email.');return;}
+  document.getElementById('ctaForm').style.display='none';
+  document.getElementById('ctaSuccess').style.display='block';
+}
+</script>
+</body>
+</html>

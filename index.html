@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandlot — Mobile Sports for Every Neighborhood</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#1a3a5c;--lime:#a8e63d;--chalk:#f5f0e8;--grass:#2d5016;--dirt:#c4832a;--ink:#0f0f0f;--mid:#5a5a5a;--white:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--chalk);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 6vw;height:64px;background:rgba(26,58,92,0.96);backdrop-filter:blur(12px)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--lime);text-decoration:none;letter-spacing:1px}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:13px;letter-spacing:.5px;transition:color .2s}
+.nav-links a:hover{color:var(--lime)}
+.nav-cta{background:var(--lime)!important;color:var(--ink)!important;padding:8px 20px;border-radius:2px;font-weight:600!important;font-size:13px!important;transition:opacity .2s!important}
+.nav-cta:hover{opacity:.85}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer}
+.nav-hamburger span{width:24px;height:2px;background:white;display:block}
+
+/* HERO */
+.hero{min-height:100vh;background:var(--sky);display:flex;flex-direction:column;justify-content:center;padding:120px 8vw 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(255,255,255,0.02) 80px,rgba(255,255,255,0.02) 81px)}
+.hero-bg-word{position:absolute;right:-40px;bottom:-60px;font-family:'Bebas Neue',sans-serif;font-size:clamp(180px,30vw,420px);color:rgba(168,230,61,0.05);line-height:1;pointer-events:none;letter-spacing:-4px;user-select:none}
+.hero-tag{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--lime);margin-bottom:20px;animation:fadeUp .6s ease both}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,11vw,148px);color:var(--white);line-height:.9;letter-spacing:-1px;animation:fadeUp .6s .1s ease both}
+.hero h1 em{color:var(--lime);font-style:normal}
+.hero-sub{font-size:clamp(17px,2vw,22px);color:rgba(255,255,255,0.6);max-width:560px;margin-top:28px;font-weight:300;animation:fadeUp .6s .2s ease both}
+.hero-actions{display:flex;gap:16px;margin-top:44px;flex-wrap:wrap;animation:fadeUp .6s .3s ease both}
+.btn-primary{background:var(--lime);color:var(--ink);padding:16px 36px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;border:none;cursor:pointer;text-decoration:none;display:inline-block;transition:opacity .2s}
+.btn-primary:hover{opacity:.88}
+.btn-ghost{background:transparent;color:var(--white);padding:14px 34px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;border:2px solid rgba(255,255,255,0.3);cursor:pointer;text-decoration:none;display:inline-block;transition:border-color .2s}
+.btn-ghost:hover{border-color:var(--lime);color:var(--lime)}
+.hero-stats{display:flex;gap:48px;margin-top:64px;padding-top:48px;border-top:1px solid rgba(255,255,255,0.1);flex-wrap:wrap;animation:fadeUp .6s .4s ease both}
+.hs{display:flex;flex-direction:column}
+.hs-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--lime);line-height:1}
+.hs-label{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:rgba(255,255,255,0.4);margin-top:2px}
+
+/* MARQUEE */
+.marquee-wrap{background:var(--lime);overflow:hidden;padding:12px 0;white-space:nowrap}
+.marquee-inner{display:inline-flex;animation:marquee 30s linear infinite}
+.marquee-item{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--grass);letter-spacing:2px;padding:0 32px}
+.marquee-dot{color:var(--grass);opacity:.5}
+
+/* SECTIONS */
+.section{padding:96px 8vw}
+.section-sky{background:var(--sky);color:var(--white)}
+.section-grass{background:var(--grass);color:var(--white)}
+.section-ink{background:var(--ink);color:var(--white)}
+.section-chalk{background:var(--chalk)}
+.eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;opacity:.55}
+.section-sky .eyebrow,.section-grass .eyebrow,.section-ink .eyebrow{opacity:.6;color:var(--lime)}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,6vw,80px);line-height:.95;margin-bottom:40px}
+.accent{color:var(--lime)}
+.prose{max-width:680px;font-size:16px;line-height:1.8;color:var(--mid)}
+.section-sky .prose,.section-grass .prose,.section-ink .prose{color:rgba(255,255,255,0.65)}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;margin-top:56px}
+.step{padding:48px 36px;background:rgba(255,255,255,0.04);position:relative}
+.step:hover{background:rgba(168,230,61,0.06)}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--lime);opacity:.25;line-height:1;margin-bottom:12px}
+.step h3{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);margin-bottom:10px}
+.step p{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.7}
+
+/* SPORTS GRID */
+.sports-intro{max-width:600px;margin-bottom:48px}
+.sports-tags{display:flex;flex-wrap:wrap;gap:10px}
+.stag{background:var(--white);border:2px solid rgba(26,58,92,0.12);padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.5px;color:var(--sky);cursor:default;transition:all .15s}
+.stag:hover{background:var(--sky);color:var(--lime);border-color:var(--sky)}
+.stag.featured{background:var(--sky);color:var(--lime);border-color:var(--sky)}
+
+/* MEMBERSHIP */
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:48px}
+.tier{padding:40px 32px;border-radius:2px;position:relative}
+.tier-player{background:var(--sky)}
+.tier-mvp{background:var(--lime)}
+.tier-family{background:var(--grass)}
+.tier-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;color:rgba(255,255,255,0.5)}
+.tier-mvp .tier-label{color:var(--grass)}
+.tier-price{font-family:'Bebas Neue',sans-serif;font-size:60px;line-height:1;color:var(--lime);margin-bottom:4px}
+.tier-mvp .tier-price{color:var(--grass)}
+.tier-period{font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:24px}
+.tier-mvp .tier-period{color:rgba(0,0,0,0.4)}
+.tier-features{list-style:none;font-size:13px;line-height:2.1;color:rgba(255,255,255,0.75)}
+.tier-mvp .tier-features{color:rgba(0,0,0,0.7)}
+.tier-features li::before{content:'✓  ';color:var(--lime)}
+.tier-mvp .tier-features li::before{color:var(--grass)}
+.tier-badge{position:absolute;top:20px;right:20px;background:var(--dirt);color:white;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;padding:4px 10px;text-transform:uppercase}
+
+/* LOCATION CARDS */
+.loc-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:48px}
+.loc-card{padding:44px 36px;background:rgba(255,255,255,0.05);border-top:4px solid var(--lime);text-decoration:none;display:block;transition:background .2s}
+.loc-card:hover{background:rgba(168,230,61,0.08)}
+.loc-icon{font-size:36px;margin-bottom:16px;display:block}
+.loc-card h3{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);margin-bottom:10px}
+.loc-card p{font-size:13px;color:rgba(255,255,255,0.6);line-height:1.65;margin-bottom:20px}
+.loc-link{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--lime)}
+
+/* WAITLIST */
+.waitlist-wrap{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.wl-form{display:flex;flex-direction:column;gap:12px;margin-top:32px}
+.wl-input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--white);outline:none;border-radius:0}
+.wl-input::placeholder{color:rgba(255,255,255,0.35)}
+.wl-input:focus{border-color:var(--lime)}
+.wl-select{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--white);outline:none;border-radius:0;appearance:none;cursor:pointer}
+.wl-select option{background:var(--sky);color:white}
+.wl-btn{background:var(--lime);color:var(--ink);padding:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;border:none;cursor:pointer;transition:opacity .2s}
+.wl-btn:hover{opacity:.85}
+.wl-big{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,8vw,100px);color:var(--lime);line-height:.9}
+.wl-tagline{font-size:18px;color:rgba(255,255,255,0.6);margin-top:16px;max-width:320px;font-style:italic;font-weight:300}
+.wl-success{display:none;padding:20px;background:rgba(168,230,61,0.15);border:1px solid rgba(168,230,61,0.4);color:var(--lime);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px}
+
+/* FOOTER */
+footer{background:var(--ink);padding:60px 8vw 32px;color:rgba(255,255,255,0.5)}
+.footer-top{display:grid;grid-template-columns:1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--lime);line-height:1;margin-bottom:8px}
+.footer-tagline{font-size:13px}
+.footer-col h4{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:16px}
+.footer-col a{display:block;color:rgba(255,255,255,0.5);text-decoration:none;font-size:13px;line-height:2.2;transition:color .2s}
+.footer-col a:hover{color:var(--lime)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.08);padding-top:24px;display:flex;justify-content:space-between;font-size:12px;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2)}
+
+.chalk-divider{height:4px;background:repeating-linear-gradient(90deg,var(--lime),var(--lime) 24px,transparent 24px,transparent 36px);opacity:.35}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+@media(max-width:768px){
+  .nav-links{display:none}
+  .nav-hamburger{display:flex}
+  .hero h1{font-size:clamp(52px,14vw,80px)}
+  .waitlist-wrap{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr}
+  .hero-stats{gap:32px}
+  .steps{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">SANDLOT</a>
+  <div class="nav-links">
+    <a href="#how">How It Works</a>
+    <a href="#sports">Sports</a>
+    <a href="#membership">Membership</a>
+    <a href="#locations">For Your Location</a>
+    <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+  </div>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-word">PLAY</div>
+  <div class="hero-tag">Coming to Your Neighborhood</div>
+  <h1>YOUR SPORT.<br>YOUR STREET.<br><em>SHOW UP.</em></h1>
+  <p class="hero-sub">Sandlot is a fully-equipped mobile sports operation that comes to you — your school, your apartment complex, your park. All ages. 50+ sports. One affordable membership.</p>
+  <div class="hero-actions">
+    <a href="#waitlist" class="btn-primary">Join the Waitlist</a>
+    <a href="#how" class="btn-ghost">See How It Works</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hs"><span class="hs-num">50+</span><span class="hs-label">Sports Available</span></div>
+    <div class="hs"><span class="hs-num">$19</span><span class="hs-label">Starting / Month</span></div>
+    <div class="hs"><span class="hs-num">0</span><span class="hs-label">Equipment to Buy</span></div>
+    <div class="hs"><span class="hs-num">All</span><span class="hs-label">Ages Welcome</span></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <span class="marquee-item">Pickleball</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Flag Football</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Volleyball</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Tennis</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Basketball</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Soccer</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Disc Golf</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Cornhole</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Spikeball</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Kickball</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Yoga</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Agility</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Badminton</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Bocce</span><span class="marquee-dot">·</span>
+    <!-- duplicate for seamless loop -->
+    <span class="marquee-item">Pickleball</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Flag Football</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Volleyball</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Tennis</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Basketball</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Soccer</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Disc Golf</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Cornhole</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Spikeball</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Kickball</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Yoga</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Agility</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Badminton</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Bocce</span><span class="marquee-dot">·</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section section-sky" id="how">
+  <div class="eyebrow">The Process</div>
+  <div class="section-title">HOW SANDLOT<br><span class="accent">WORKS</span></div>
+  <p class="prose">No facilities to book. No equipment to buy. No league to join. We handle everything — you just show up and play.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Sign Up & Pick Your Sport</h3>
+      <p>Join Sandlot and browse upcoming events near you. Pick a sport, reserve your spot, and invite friends. All through the app.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>We Come to You</h3>
+      <p>A fully-loaded Sandlot truck arrives at your location with all equipment, a certified Game Manager, and everything needed to run a world-class session.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Play. Level Up. Repeat.</h3>
+      <p>Track your sessions, earn badges, compete on leaderboards, and explore new sports. Your membership keeps you on the field all year.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <h3>Get Rewarded</h3>
+      <p>After every session, unlock exclusive gear offers and discounts from top sports brands. The more you play, the better the deals.</p>
+    </div>
+  </div>
+</section>
+
+<div class="chalk-divider"></div>
+
+<!-- SPORTS -->
+<section class="section section-chalk" id="sports">
+  <div class="eyebrow">The Menu</div>
+  <div class="section-title">50+ <span class="accent" style="color:var(--sky)">SPORTS.</span><br>ONE TRUCK.</div>
+  <p class="prose" style="color:var(--mid)">We match the right sport to the right community. Apartment courtyard? Pickleball and volleyball. School field? Flag football and soccer. Senior community? Lawn games and gentle movement. Our AI does the matching — you just show up.</p>
+  <div class="sports-tags" style="margin-top:40px">
+    <span class="stag featured">🏓 Pickleball</span>
+    <span class="stag featured">🏈 Flag Football</span>
+    <span class="stag featured">🏐 Volleyball</span>
+    <span class="stag featured">🎾 Tennis</span>
+    <span class="stag featured">⚽ Soccer Skills</span>
+    <span class="stag">🏀 Basketball</span>
+    <span class="stag">🥏 Disc Golf</span>
+    <span class="stag">🎯 Cornhole</span>
+    <span class="stag">🏸 Badminton</span>
+    <span class="stag">🎾 Paddle Tennis</span>
+    <span class="stag">🏃 Agility Training</span>
+    <span class="stag">🧘 Yoga</span>
+    <span class="stag">🥏 Ultimate Frisbee</span>
+    <span class="stag">⛳ Bocce Ball</span>
+    <span class="stag">🎪 Spikeball</span>
+    <span class="stag">🏃 Relay Races</span>
+    <span class="stag">🪃 Kan Jam</span>
+    <span class="stag">⚾ Wiffle Ball</span>
+    <span class="stag">🦵 Kickball</span>
+    <span class="stag">🏹 Archery Tag</span>
+    <span class="stag">🎯 Speed Stacks</span>
+    <span class="stag">🤸 Balance & Core</span>
+    <span class="stag">🏇 Track & Field</span>
+    <span class="stag">🌿 Kubb</span>
+    <span class="stag">🎪 Dance Fitness</span>
+    <span class="stag">+ 25 More</span>
+  </div>
+</section>
+
+<!-- MEMBERSHIP -->
+<section class="section section-sky" id="membership">
+  <div class="eyebrow">Pricing</div>
+  <div class="section-title">LESS THAN<br>ONE <span class="accent">SMOOTHIE</span><br>PER WEEK.</div>
+  <p class="prose">Sandlot is built to be the easiest yes you'll ever make. Professional sports programming, world-class equipment, certified coaches — for the cost of a streaming subscription.</p>
+  <div class="tiers">
+    <div class="tier tier-player">
+      <div class="tier-label">Player</div>
+      <div class="tier-price">$19<span style="font-size:28px">.99</span></div>
+      <div class="tier-period">per month</div>
+      <ul class="tier-features">
+        <li>Unlimited events — home city</li>
+        <li>Priority booking</li>
+        <li>Full app + stats tracking</li>
+        <li>Gear discounts & offers</li>
+        <li>Digital badge + member ID</li>
+      </ul>
+    </div>
+    <div class="tier tier-mvp">
+      <div class="tier-badge">Best Value</div>
+      <div class="tier-label">MVP</div>
+      <div class="tier-price">$29<span style="font-size:28px">.99</span></div>
+      <div class="tier-period">per month</div>
+      <ul class="tier-features">
+        <li>Unlimited — everywhere Sandlot operates</li>
+        <li>2 guest passes per month</li>
+        <li>AI skills tracking & coaching</li>
+        <li>Premium gear offers</li>
+        <li>Early access to new sports</li>
+        <li>MVP jersey (Year 1 members)</li>
+      </ul>
+    </div>
+    <div class="tier tier-family">
+      <div class="tier-label">Family</div>
+      <div class="tier-price">$39<span style="font-size:28px">.99</span></div>
+      <div class="tier-period">per month · up to 6</div>
+      <ul class="tier-features">
+        <li>All MVP benefits × 6 people</li>
+        <li>Family leaderboards</li>
+        <li>Kids skills passport</li>
+        <li>Birthday event credit</li>
+        <li>Family challenge badges</li>
+      </ul>
+    </div>
+  </div>
+  <div style="margin-top:20px;padding:24px 28px;background:rgba(255,255,255,0.05);border-left:4px solid var(--lime);font-size:14px;color:rgba(255,255,255,0.65)">
+    <strong style="color:var(--lime)">Schools, apartments, cities & HOAs:</strong> We offer institutional contracts at deeply discounted per-person rates. Get Sandlot as a resident or student benefit — no individual signup required. <a href="#locations" style="color:var(--lime)">Learn more →</a>
+  </div>
+</section>
+
+<!-- LOCATIONS -->
+<section class="section section-ink" id="locations">
+  <div class="eyebrow">For Your Location</div>
+  <div class="section-title">SANDLOT<br>COMES TO <span class="accent">YOU.</span></div>
+  <p class="prose">Whether you're a property manager, school administrator, city parks director, or event organizer — Sandlot plugs into your community and runs itself. We handle equipment, staffing, insurance, and scheduling.</p>
+  <div class="loc-cards">
+    <a href="apartments.html" class="loc-card">
+      <span class="loc-icon">🏢</span>
+      <h3>Apartments & HOAs</h3>
+      <p>Turn your underused courtyard or common space into the most popular amenity in the building. Residents love it. Retention improves.</p>
+      <span class="loc-link">Learn more →</span>
+    </a>
+    <a href="schools.html" class="loc-card">
+      <span class="loc-icon">🏫</span>
+      <h3>Schools & Districts</h3>
+      <p>Enrich PE programming, activate after-school hours, and give every kid access to sports they'd never otherwise try — at a price that fits any budget.</p>
+      <span class="loc-link">Learn more →</span>
+    </a>
+    <a href="cities.html" class="loc-card">
+      <span class="loc-icon">🏙️</span>
+      <h3>Cities & Municipalities</h3>
+      <p>Bring professional sports programming to every park in your city — not just the big ones. Turnkey. Insured. Budget-friendly.</p>
+      <span class="loc-link">Learn more →</span>
+    </a>
+    <div class="loc-card" style="cursor:default">
+      <span class="loc-icon">🤝</span>
+      <h3>Events & Nonprofits</h3>
+      <p>Pop-up sports experiences for festivals, community events, corporate picnics, faith organizations, and community health initiatives.</p>
+      <span class="loc-link" style="color:rgba(255,255,255,0.3)">Coming soon</span>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section class="section section-sky" id="waitlist">
+  <div class="waitlist-wrap">
+    <div>
+      <div class="wl-big">BE<br>FIRST<br>IN<br>LINE.</div>
+      <p class="wl-tagline">Sandlot is launching in Texas first. Get on the list and we'll notify you the moment your city is live.</p>
+    </div>
+    <div>
+      <div class="eyebrow">Join the Waitlist</div>
+      <div class="section-title" style="font-size:clamp(36px,4vw,52px);margin-bottom:8px">YOUR SPORT<br><span class="accent">IS WAITING.</span></div>
+      <div class="wl-form" id="wlForm">
+        <input class="wl-input" type="text" placeholder="Your name" id="wlName">
+        <input class="wl-input" type="email" placeholder="Email address" id="wlEmail">
+        <input class="wl-input" type="text" placeholder="City, State" id="wlCity">
+        <select class="wl-select" id="wlType">
+          <option value="">I am a...</option>
+          <option>Individual / Family</option>
+          <option>School / District Administrator</option>
+          <option>Property Manager / HOA</option>
+          <option>City / Parks & Rec</option>
+          <option>Corporate / Event Organizer</option>
+          <option>Nonprofit</option>
+        </select>
+        <button class="wl-btn" onclick="submitWaitlist()">JOIN THE WAITLIST →</button>
+      </div>
+      <div class="wl-success" id="wlSuccess">✓ YOU'RE ON THE LIST. WE'LL BE IN TOUCH SOON.</div>
+      <p style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.3);font-family:'Space Mono',monospace">No spam. No fees to join the list. Just first access.</p>
+    </div>
+  </div>
+</section>
+
+<div class="chalk-divider"></div>
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">SANDLOT</div>
+      <div class="footer-tagline">Mobile Sports · Every Community · All Ages</div>
+      <p style="margin-top:20px;font-size:13px;max-width:260px;line-height:1.7">Making sports affordable and accessible to every neighborhood in America.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#how">How It Works</a>
+      <a href="#sports">Sports Menu</a>
+      <a href="#membership">Membership</a>
+      <a href="#waitlist">Join Waitlist</a>
+    </div>
+    <div class="footer-col">
+      <h4>For Partners</h4>
+      <a href="apartments.html">Apartments & HOAs</a>
+      <a href="schools.html">Schools & Districts</a>
+      <a href="cities.html">Cities & Parks</a>
+      <a href="manufacturers.html">Manufacturers</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Sandlot Mobile Sports · sandlotsport.com</span>
+    <span>Austin, TX · Launching Soon</span>
+  </div>
+</footer>
+
+<script>
+function submitWaitlist(){
+  const n=document.getElementById('wlName').value;
+  const e=document.getElementById('wlEmail').value;
+  if(!n||!e){alert('Please enter your name and email.');return;}
+  document.getElementById('wlForm').style.display='none';
+  document.getElementById('wlSuccess').style.display='block';
+}
+</script>
+</body>
+</html>

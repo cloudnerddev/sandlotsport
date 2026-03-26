@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandlot — For Schools & Districts</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#1a3a5c;--lime:#a8e63d;--chalk:#f5f0e8;--grass:#2d5016;--dirt:#c4832a;--ink:#0f0f0f;--mid:#5a5a5a;--white:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--chalk);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden}
+#gate{position:fixed;inset:0;background:var(--dirt);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gate-logo{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--chalk);line-height:1}
+.gate-sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:48px}
+.gate-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:10px;width:320px}
+.gate-input{width:320px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);padding:16px 20px;font-size:16px;color:white;outline:none;letter-spacing:4px;text-align:center;font-family:'DM Sans',sans-serif}
+.gate-input:focus{border-color:var(--lime)}
+.gate-btn{width:320px;margin-top:12px;background:var(--lime);color:var(--ink);padding:16px;font-family:'Bebas Neue',sans-serif;font-size:22px;border:none;cursor:pointer}
+.gate-err{width:320px;margin-top:10px;font-family:'Space Mono',monospace;font-size:11px;color:#fff;display:none;text-align:center;background:rgba(231,76,60,0.4);padding:8px}
+.gate-back{margin-top:24px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.3);text-decoration:none;text-transform:uppercase}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 6vw;height:64px;background:rgba(196,131,42,0.97);backdrop-filter:blur(12px)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--chalk);text-decoration:none}
+.nav-tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.45)}
+.nav-cta{background:var(--sky);color:var(--white);padding:8px 20px;font-weight:600;text-decoration:none;font-size:13px}
+
+.hero{min-height:100vh;background:var(--dirt);display:flex;flex-direction:column;justify-content:center;padding:120px 8vw 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent,transparent 60px,rgba(0,0,0,0.03) 60px,rgba(0,0,0,0.03) 61px)}
+.hero::after{content:'🏫';position:absolute;right:4vw;bottom:-40px;font-size:clamp(200px,28vw,360px);opacity:.08;pointer-events:none}
+.hero-eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--chalk);opacity:.7;margin-bottom:16px}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,10vw,128px);color:var(--white);line-height:.9;letter-spacing:-1px;margin-bottom:28px}
+.hero h1 em{color:var(--lime);font-style:normal}
+.hero-sub{font-size:clamp(16px,2vw,20px);color:rgba(255,255,255,0.65);max-width:600px;font-weight:300;margin-bottom:44px}
+.btn-p{background:var(--lime);color:var(--ink);padding:16px 36px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;border:none;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-g{background:transparent;color:var(--white);padding:14px 34px;font-family:'Bebas Neue',sans-serif;font-size:20px;border:2px solid rgba(255,255,255,0.3);text-decoration:none;display:inline-block;margin-left:12px}
+.hero-stats{display:flex;gap:48px;margin-top:60px;padding-top:48px;border-top:1px solid rgba(255,255,255,0.15);flex-wrap:wrap}
+.hs{display:flex;flex-direction:column}
+.hs-num{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--lime);line-height:1}
+.hs-label{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:rgba(255,255,255,0.4);margin-top:2px}
+
+.section{padding:88px 8vw}
+.section-sky{background:var(--sky);color:var(--white)}
+.section-chalk{background:var(--chalk)}
+.section-ink{background:var(--ink);color:var(--white)}
+.eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;opacity:.7}
+.section-sky .eyebrow,.section-ink .eyebrow{color:var(--lime)}
+.section-chalk .eyebrow{color:var(--dirt)}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,6vw,76px);line-height:.95;margin-bottom:36px}
+.accent-lime{color:var(--lime)}
+.accent-dirt{color:var(--dirt)}
+.prose{max-width:680px;font-size:16px;line-height:1.8}
+.prose-light{color:rgba(255,255,255,0.65)}
+.prose-dark{color:var(--mid)}
+
+/* STAT BANNER */
+.stat-banner{background:var(--sky);padding:60px 8vw;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:3px}
+.sb-block{padding:40px 32px;background:rgba(255,255,255,0.04);text-align:center}
+.sb-num{font-family:'Bebas Neue',sans-serif;font-size:64px;color:var(--lime);line-height:1}
+.sb-label{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.45);margin-top:6px}
+
+/* WHY IT MATTERS */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:48px}
+.why-block{padding:44px 36px;background:var(--white);border-top:3px solid transparent}
+.why-block:nth-child(1){border-color:var(--lime)}
+.why-block:nth-child(2){border-color:var(--sky)}
+.why-block:nth-child(3){border-color:var(--dirt)}
+.why-block:nth-child(4){border-color:var(--grass)}
+.why-icon{font-size:28px;margin-bottom:14px}
+.why-block h3{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--sky);margin-bottom:10px}
+.why-block p{font-size:14px;color:var(--mid);line-height:1.7}
+
+/* PROGRAMS */
+.programs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:48px}
+.prog{padding:40px 32px;border-radius:2px}
+.prog-pe{background:var(--sky)}
+.prog-after{background:var(--grass)}
+.prog-community{background:var(--ink)}
+.prog-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:12px}
+.prog h3{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);margin-bottom:12px}
+.prog p{font-size:13px;color:rgba(255,255,255,0.6);line-height:1.7;margin-bottom:16px}
+.prog-detail{font-family:'Space Mono',monospace;font-size:11px;color:var(--lime);letter-spacing:1px}
+
+/* PRICING */
+.school-pricing{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:3px;margin-top:48px}
+.sp-block{padding:40px 32px;background:rgba(255,255,255,0.04)}
+.sp-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:12px}
+.sp-price{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--lime);line-height:1;margin-bottom:4px}
+.sp-unit{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:20px}
+.sp-features{list-style:none;font-size:13px;line-height:2;color:rgba(255,255,255,0.6)}
+.sp-features li::before{content:'✓  ';color:var(--lime)}
+.sp-note{margin-top:28px;padding:20px 24px;background:rgba(168,230,61,0.08);border-left:3px solid var(--lime);font-size:13px;color:rgba(255,255,255,0.65)}
+
+/* GRANT BOX */
+.grant-wrap{background:var(--lime);padding:56px 48px;margin-top:0}
+.grant-wrap h3{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--grass);margin-bottom:16px}
+.grant-wrap p{font-size:16px;color:rgba(45,80,22,0.75);max-width:660px;margin-bottom:24px;line-height:1.75}
+.grant-tags{display:flex;flex-wrap:wrap;gap:10px}
+.gtag{background:rgba(45,80,22,0.15);border:1px solid rgba(45,80,22,0.25);padding:8px 16px;font-family:'Space Mono',monospace;font-size:11px;color:var(--grass)}
+
+/* TESTIMONIAL AREA */
+.quote-strip{background:var(--sky);padding:80px 8vw;text-align:center}
+.big-quote{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);color:var(--white);line-height:1.2;max-width:800px;margin:0 auto}
+.big-quote em{color:var(--lime);font-style:normal}
+
+/* CTA */
+.cta{background:var(--ink);padding:96px 8vw;text-align:center}
+.cta h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,7vw,90px);color:var(--white);line-height:.9;margin-bottom:24px}
+.cta h2 span{color:var(--lime)}
+.cta p{font-size:18px;color:rgba(255,255,255,0.55);max-width:520px;margin:0 auto 40px}
+.cta-form{display:flex;flex-direction:column;gap:12px;max-width:480px;margin:0 auto}
+.cta-input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:15px;color:white;outline:none}
+.cta-input::placeholder{color:rgba(255,255,255,0.3)}
+.cta-input:focus{border-color:var(--lime)}
+.cta-select{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:15px;color:rgba(255,255,255,0.7);outline:none;appearance:none}
+.cta-select option{background:var(--ink);color:white}
+.cta-btn{background:var(--lime);color:var(--ink);padding:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;border:none;cursor:pointer}
+.cta-success{display:none;padding:20px;background:rgba(168,230,61,0.1);border:2px solid var(--lime);color:var(--lime);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;max-width:480px;margin:0 auto;text-align:center}
+
+.chalk-divider{height:4px;background:repeating-linear-gradient(90deg,var(--lime),var(--lime) 24px,transparent 24px,transparent 36px);opacity:.3}
+footer{background:rgba(0,0,0,0.8);padding:40px 8vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--lime)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{color:rgba(255,255,255,0.35);text-decoration:none;font-size:12px;font-family:'Space Mono',monospace}
+@media(max-width:768px){.why-grid,.programs{grid-template-columns:1fr}.hero-stats{gap:24px}}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-logo">SANDLOT</div>
+  <div class="gate-sub">School & District Partner Portal</div>
+  <div class="gate-label">Enter Access Password</div>
+  <input class="gate-input" type="password" id="pwInput" placeholder="••••••••••" autocomplete="off">
+  <button class="gate-btn" onclick="checkPW()">ENTER →</button>
+  <div class="gate-err" id="pwErr">INCORRECT PASSWORD. CONTACT YOUR SANDLOT REPRESENTATIVE.</div>
+  <a href="index.html" class="gate-back">← Back to sandlotsport.com</a>
+</div>
+
+<nav>
+  <a class="nav-logo" href="index.html">SANDLOT</a>
+  <span class="nav-tag">For Schools & Districts</span>
+  <a href="#contact" class="nav-cta">Get a Proposal</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">For Schools, Districts & After-School Programs</div>
+  <h1>EVERY KID.<br>EVERY SPORT.<br><em>EVERY DAY.</em></h1>
+  <p class="hero-sub">Sandlot delivers fully-equipped, staffed, and insured sports programming directly to your campus — enriching PE, activating after-school hours, and making sports accessible to every student regardless of ability or budget.</p>
+  <div>
+    <a href="#contact" class="btn-p">Request a School Proposal</a>
+    <a href="#programs" class="btn-g">See Our Programs</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hs"><span class="hs-num">$4–6</span><span class="hs-label">Per Student / Month</span></div>
+    <div class="hs"><span class="hs-num">50+</span><span class="hs-label">Sports Available</span></div>
+    <div class="hs"><span class="hs-num">All</span><span class="hs-label">Skill Levels</span></div>
+    <div class="hs"><span class="hs-num">Grant</span><span class="hs-label">Eligible Costs</span></div>
+  </div>
+</section>
+
+<!-- STAT BANNER -->
+<div class="stat-banner">
+  <div class="sb-block"><div class="sb-num">70%</div><div class="sb-label">Of kids quit sports before 13</div></div>
+  <div class="sb-block"><div class="sb-num">Age 11</div><div class="sb-label">Average quit age today</div></div>
+  <div class="sb-block"><div class="sb-num">24%</div><div class="sb-label">Of kids meet daily activity guidelines</div></div>
+  <div class="sb-block"><div class="sb-num">$0</div><div class="sb-label">Cost to students/families</div></div>
+</div>
+
+<!-- WHY IT MATTERS -->
+<section class="section section-chalk" id="why">
+  <div class="eyebrow">The Research</div>
+  <div class="section-title">SPORTS AREN'T<br>OPTIONAL.<br><span class="accent-dirt">THEY'RE ACADEMIC.</span></div>
+  <p class="prose prose-dark">The link between physical activity and academic performance is among the most robust in education research. Sandlot isn't just a fun add-on — it's a documented academic support strategy.</p>
+  <div class="why-grid">
+    <div class="why-block">
+      <div class="why-icon">🧠</div>
+      <h3>Academic Performance</h3>
+      <p>Students who participate in physical activity show measurable improvements in attention, memory, and academic achievement. PE isn't a break from learning — it enables it.</p>
+    </div>
+    <div class="why-block">
+      <div class="why-icon">❤️</div>
+      <h3>Mental Health Outcomes</h3>
+      <p>Youth athletes show lower rates of anxiety, depression, and behavioral issues. With youth mental health at a national crisis point, regular physical activity is one of the most evidence-based interventions available.</p>
+    </div>
+    <div class="why-block">
+      <div class="why-icon">🤝</div>
+      <h3>Social-Emotional Skills</h3>
+      <p>Teamwork, resilience, leadership, and conflict resolution — the skills most employers cite as critical — are all built on the playing field. Sandlot is SEL programming that doesn't feel like a program.</p>
+    </div>
+    <div class="why-block">
+      <div class="why-icon">🏅</div>
+      <h3>Equity in Access</h3>
+      <p>Students from low-income families are half as likely to participate in sports. Sandlot comes to the school — eliminating the transportation, equipment cost, and fee barriers that keep kids on the sidelines.</p>
+    </div>
+  </div>
+</section>
+
+<div class="chalk-divider"></div>
+
+<!-- PROGRAMS -->
+<section class="section section-sky" id="programs">
+  <div class="eyebrow">Program Options</div>
+  <div class="section-title">THREE WAYS<br>SANDLOT SERVES<br><span class="accent-lime">YOUR SCHOOL.</span></div>
+  <div class="programs">
+    <div class="prog prog-pe">
+      <div class="prog-label">During School</div>
+      <h3>PE Enrichment</h3>
+      <p>Sandlot supplements your existing PE program with rotating sport experiences students can't get anywhere else. Pickleball, disc golf, agility training, and team sports — with certified Game Managers who handle instruction.</p>
+      <div class="prog-detail">1–5 sessions/week · integrates with existing schedule</div>
+    </div>
+    <div class="prog prog-after">
+      <div class="prog-label">After School</div>
+      <h3>After-School Sports</h3>
+      <p>Turn dismissal time into the best part of the day. Sandlot runs structured after-school sessions that give working parents a safe, active option — and give kids a reason to stay engaged in school.</p>
+      <div class="prog-detail">M–F programming · supports ASES / 21st Century grants</div>
+    </div>
+    <div class="prog prog-community">
+      <div class="prog-label">Weekend / Community</div>
+      <h3>Family Sports Nights</h3>
+      <p>Open your school grounds to the community on evenings and weekends. Parents and kids play together. The school becomes a community hub. Families see the school as a positive presence.</p>
+      <div class="prog-detail">Evenings & weekends · family memberships available</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section section-sky" style="padding-top:0" id="pricing">
+  <div class="eyebrow">School Pricing</div>
+  <div class="section-title">LESS THAN A<br><span class="accent-lime">FIELD TRIP.</span></div>
+  <div class="school-pricing">
+    <div class="sp-block">
+      <div class="sp-label">Single School</div>
+      <div class="sp-price">$4</div>
+      <div class="sp-unit">per student / month · min. 200 students</div>
+      <ul class="sp-features">
+        <li>2 Sandlot sessions/week on campus</li>
+        <li>PE period integration</li>
+        <li>All equipment provided</li>
+        <li>Certified Game Managers</li>
+        <li>Monthly participation report</li>
+        <li>Student skills passports</li>
+      </ul>
+    </div>
+    <div class="sp-block" style="background:rgba(168,230,61,0.08);border:1px solid rgba(168,230,61,0.15)">
+      <div class="sp-label" style="color:var(--lime)">School + After-School · Best Value</div>
+      <div class="sp-price">$6</div>
+      <div class="sp-unit">per student / month · full program</div>
+      <ul class="sp-features">
+        <li>All PE enrichment features</li>
+        <li>Daily after-school sports program</li>
+        <li>Parent communication portal</li>
+        <li>Family sports nights monthly</li>
+        <li>ASES grant documentation support</li>
+        <li>Teacher/admin dashboard</li>
+        <li>Annual student progress reports</li>
+      </ul>
+    </div>
+    <div class="sp-block">
+      <div class="sp-label">District Partnership</div>
+      <div class="sp-price">Custom</div>
+      <div class="sp-unit">multi-school contract · per-student discount</div>
+      <ul class="sp-features">
+        <li>Volume pricing (5–50+ schools)</li>
+        <li>Dedicated district coordinator</li>
+        <li>District-wide data dashboard</li>
+        <li>State reporting templates</li>
+        <li>Grant writing support</li>
+        <li>Title I priority schools included</li>
+        <li>Community sports extension</li>
+      </ul>
+    </div>
+  </div>
+  <div class="sp-note">
+    <strong style="color:var(--lime)">Title I Schools:</strong> Sandlot offers a 40% cost reduction for Title I-designated schools. Our Sandlot Foundation provides fully subsidized programming in designated high-need communities. No child should sit on the sidelines because of zip code.
+  </div>
+</section>
+
+<!-- GRANTS -->
+<section class="grant-wrap">
+  <h3>YOUR SANDLOT PROGRAM<br>CAN BE FUNDED BY GRANTS.</h3>
+  <p>We've done the research. Sandlot programming qualifies for a wide range of education and physical activity grants at the federal, state, and foundation levels. We'll provide the activity descriptions, outcome data templates, and reporting language you need for every application.</p>
+  <div class="grant-tags">
+    <span class="gtag">Title IV-A Student Support</span>
+    <span class="gtag">21st Century Learning Centers</span>
+    <span class="gtag">ASES After-School Grants</span>
+    <span class="gtag">CDC Youth Physical Activity</span>
+    <span class="gtag">Carol M. White PEP Grants</span>
+    <span class="gtag">State PE Equipment Funds</span>
+    <span class="gtag">USDA Healthy School Initiative</span>
+    <span class="gtag">Community Foundation Grants</span>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote-strip">
+  <p class="big-quote">"The research is unambiguous: <em>kids who move learn better, feel better, and do better.</em> Sandlot is the first solution that makes it possible to keep every child active — not just the ones whose parents can afford travel sports."</p>
+  <p style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:rgba(255,255,255,0.3);margin-top:28px;text-transform:uppercase">Sandlot · Mission Statement</p>
+</div>
+
+<!-- CTA -->
+<section class="cta" id="contact">
+  <h2>LET'S BUILD<br>YOUR SCHOOL'S<br><span>PROGRAM.</span></h2>
+  <p>Share a few details and we'll put together a custom proposal — including grant language, sample schedules, and per-student cost breakdowns.</p>
+  <div class="cta-form" id="ctaForm">
+    <input class="cta-input" type="text" placeholder="Your name & title" id="ctaName">
+    <input class="cta-input" type="text" placeholder="School or district name" id="ctaSchool">
+    <input class="cta-input" type="text" placeholder="City & State" id="ctaCity">
+    <input class="cta-input" type="text" placeholder="Approximate student enrollment" id="ctaEnroll">
+    <select class="cta-select" id="ctaType">
+      <option value="">I represent a...</option>
+      <option>Single school</option>
+      <option>School district</option>
+      <option>Charter school / network</option>
+      <option>After-school program provider</option>
+      <option>Nonprofit / community org</option>
+    </select>
+    <input class="cta-input" type="email" placeholder="School / district email" id="ctaEmail">
+    <button class="cta-btn" onclick="submitForm()">REQUEST SCHOOL PROPOSAL →</button>
+  </div>
+  <div class="cta-success" id="ctaSuccess">✓ REQUEST RECEIVED — WE'LL HAVE YOUR CUSTOM PROPOSAL READY WITHIN 5 BUSINESS DAYS.</div>
+</section>
+
+<div class="chalk-divider"></div>
+<footer>
+  <div class="footer-logo">SANDLOT</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="apartments.html">Apartments</a>
+    <a href="cities.html">Cities</a>
+    <a href="manufacturers.html">Manufacturers</a>
+  </div>
+</footer>
+
+<script>
+if(sessionStorage.getItem('sl_auth')==='1'){document.getElementById('gate').style.display='none';}
+function checkPW(){
+  if(document.getElementById('pwInput').value==='SANDLOT25'){
+    sessionStorage.setItem('sl_auth','1');
+    document.getElementById('gate').style.display='none';
+  } else {document.getElementById('pwErr').style.display='block';}
+}
+document.addEventListener('keydown',function(e){if(e.key==='Enter')checkPW();});
+function submitForm(){
+  const n=document.getElementById('ctaName').value;
+  const e=document.getElementById('ctaEmail').value;
+  if(!n||!e){alert('Please fill in your name and email.');return;}
+  document.getElementById('ctaForm').style.display='none';
+  document.getElementById('ctaSuccess').style.display='block';
+}
+</script>
+</body>
+</html>

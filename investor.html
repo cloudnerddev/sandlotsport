@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandlot — Investor Overview</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#1a3a5c;--lime:#a8e63d;--chalk:#f5f0e8;--grass:#2d5016;--dirt:#c4832a;--ink:#0f0f0f;--mid:#5a5a5a;--white:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--white);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden}
+
+/* GATE */
+#gate{position:fixed;inset:0;background:#070707;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gate-logo{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--lime);line-height:1}
+.gate-sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:48px}
+.gate-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;width:320px}
+.gate-input{width:320px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);padding:16px 20px;font-size:16px;color:white;outline:none;letter-spacing:4px;text-align:center;font-family:'DM Sans',sans-serif}
+.gate-input:focus{border-color:var(--lime)}
+.gate-btn{width:320px;margin-top:12px;background:var(--lime);color:var(--ink);padding:16px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;border:none;cursor:pointer}
+.gate-err{width:320px;margin-top:10px;font-family:'Space Mono',monospace;font-size:11px;color:#e74c3c;display:none;text-align:center}
+.gate-back{margin-top:24px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.2);text-decoration:none;text-transform:uppercase}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 6vw;background:rgba(10,10,10,0.95);border-bottom:1px solid rgba(255,255,255,0.05)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--lime);text-decoration:none}
+.nav-conf{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.2)}
+.nav-home{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.3);text-decoration:none;text-transform:uppercase}
+.nav-home:hover{color:var(--lime)}
+
+/* COVER */
+.cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:100px 8vw 80px;background:#050505;position:relative;overflow:hidden}
+.cover::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 80% at 50% 100%,rgba(168,230,61,0.04) 0%,transparent 60%)}
+.cover-conf{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:48px;border:1px solid rgba(255,255,255,0.08);display:inline-block;padding:6px 14px}
+.cover-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(80px,14vw,180px);color:var(--white);line-height:.85;letter-spacing:-2px}
+.cover-title em{color:var(--lime);font-style:normal}
+.cover-tagline{font-size:clamp(18px,2.5vw,26px);color:rgba(255,255,255,0.5);font-weight:300;font-style:italic;margin-top:24px;max-width:580px}
+.cover-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:3px;margin-top:72px;border-top:1px solid rgba(255,255,255,0.08);padding-top:40px}
+.cm{display:flex;flex-direction:column;padding:20px 0}
+.cm-val{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--lime);line-height:1}
+.cm-key{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:4px}
+
+/* SECTIONS */
+.inv-section{padding:80px 8vw;border-top:1px solid rgba(255,255,255,0.06)}
+.inv-section:nth-child(even){background:rgba(255,255,255,0.015)}
+.sec-num{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--lime);opacity:.6;margin-bottom:8px}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,64px);line-height:.95;margin-bottom:32px}
+.accent{color:var(--lime)}
+.prose{font-size:15px;line-height:1.8;color:rgba(255,255,255,0.6);max-width:700px}
+
+/* PROBLEM / SOLUTION */
+.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:40px}
+.ps-block{padding:40px 36px;background:rgba(255,255,255,0.03)}
+.ps-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;opacity:.5}
+.ps-problem .ps-label{color:#e74c3c}
+.ps-solution .ps-label{color:var(--lime)}
+.ps-block h3{font-family:'Bebas Neue',sans-serif;font-size:24px;margin-bottom:12px}
+.ps-problem h3{color:#e74c3c}
+.ps-solution h3{color:var(--lime)}
+.ps-block p{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7}
+.ps-block ul{list-style:none;font-size:13px;color:rgba(255,255,255,0.55);line-height:2.1;margin-top:12px}
+.ps-problem ul li::before{content:'✗  ';color:#e74c3c;opacity:.6}
+.ps-solution ul li::before{content:'✓  ';color:var(--lime)}
+
+/* MARKET SIZE */
+.market-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:3px;margin-top:40px}
+.mkt-block{padding:36px 28px;background:rgba(255,255,255,0.04);text-align:center}
+.mkt-num{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--lime);line-height:1;margin-bottom:6px}
+.mkt-label{font-size:12px;color:rgba(255,255,255,0.4);line-height:1.4}
+
+/* BUSINESS MODEL */
+.model-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:3px;margin-top:40px}
+.model-block{padding:36px 28px;border-top:3px solid var(--lime);background:rgba(255,255,255,0.03)}
+.model-icon{font-size:24px;margin-bottom:12px}
+.model-block h4{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--lime);margin-bottom:8px}
+.model-block p{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6}
+.model-block .model-rev{font-family:'Space Mono',monospace;font-size:11px;color:var(--lime);margin-top:10px;letter-spacing:1px}
+
+/* PROJECTIONS */
+.proj-table{width:100%;border-collapse:collapse;margin-top:40px}
+.proj-table th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;text-align:right;padding:10px 16px;border-bottom:2px solid rgba(168,230,61,0.2);color:rgba(255,255,255,0.3)}
+.proj-table th:first-child{text-align:left}
+.proj-table td{padding:14px 16px;font-size:14px;text-align:right;border-bottom:1px solid rgba(255,255,255,0.04);color:rgba(255,255,255,0.6)}
+.proj-table td:first-child{text-align:left;color:var(--white);font-size:13px}
+.proj-table tr:last-child td{color:var(--lime);font-weight:700;background:rgba(168,230,61,0.04);border-bottom:none}
+.pos{color:#2ecc71!important}
+.neg{color:rgba(255,255,255,0.35)!important}
+.proj-note{margin-top:20px;padding:16px 20px;background:rgba(168,230,61,0.06);border-left:3px solid var(--lime);font-size:13px;color:rgba(255,255,255,0.5)}
+
+/* GROWTH LEVERS */
+.lever-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:40px}
+.lever{padding:36px 32px;background:rgba(255,255,255,0.03);display:flex;gap:20px;align-items:flex-start}
+.lever-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--lime);opacity:.25;line-height:1;min-width:52px}
+.lever-content h4{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:6px}
+.lever-content p{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6}
+.lever-content .lever-target{font-family:'Space Mono',monospace;font-size:10px;color:var(--lime);margin-top:8px;letter-spacing:1px}
+
+/* THE ASK */
+.ask-wrap{background:var(--lime);padding:80px 8vw;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.ask-left h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,10vw,120px);color:var(--grass);line-height:.9}
+.ask-left p{font-size:16px;color:rgba(45,80,22,0.7);margin-top:20px;max-width:400px;line-height:1.75}
+.ask-right{}
+.ask-line{display:flex;justify-content:space-between;align-items:flex-end;padding:20px 0;border-bottom:1px solid rgba(45,80,22,0.15)}
+.ask-line:last-child{border-bottom:none}
+.ask-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(45,80,22,0.6)}
+.ask-val{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--grass);line-height:1}
+.use-of-funds{margin-top:32px;padding:24px;background:rgba(45,80,22,0.12)}
+.uof-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(45,80,22,0.6);margin-bottom:16px}
+.uof-item{display:flex;justify-content:space-between;padding:8px 0;font-size:14px;color:rgba(45,80,22,0.75);border-bottom:1px solid rgba(45,80,22,0.1)}
+.uof-item:last-child{border-bottom:none;color:var(--grass);font-weight:600}
+
+/* MOAT */
+.moat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:3px;margin-top:40px}
+.moat-block{padding:36px 28px;background:rgba(255,255,255,0.03)}
+.moat-icon{font-size:24px;margin-bottom:14px}
+.moat-block h4{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:8px}
+.moat-block p{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6}
+
+/* TEAM */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:40px}
+.team-card{padding:32px;background:rgba(255,255,255,0.04);border-top:3px solid rgba(255,255,255,0.08)}
+.team-name{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--white);margin-bottom:4px}
+.team-title{font-size:12px;color:var(--lime);font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:10px}
+.team-bio{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.6}
+
+/* CONTACT */
+.inv-cta{background:#050505;padding:80px 8vw;text-align:center;border-top:1px solid rgba(255,255,255,0.06)}
+.inv-cta h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,96px);color:var(--white);line-height:.9;margin-bottom:24px}
+.inv-cta h2 span{color:var(--lime)}
+.inv-cta p{color:rgba(255,255,255,0.45);max-width:500px;margin:0 auto 40px}
+.inv-contact{display:flex;flex-direction:column;gap:12px;max-width:440px;margin:0 auto}
+.ic-input{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:15px;color:white;outline:none}
+.ic-input::placeholder{color:rgba(255,255,255,0.25)}
+.ic-input:focus{border-color:var(--lime)}
+.ic-btn{background:var(--lime);color:var(--ink);padding:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;border:none;cursor:pointer}
+.ic-success{display:none;padding:20px;background:rgba(168,230,61,0.08);border:2px solid var(--lime);color:var(--lime);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;text-align:center;max-width:440px;margin:0 auto}
+
+footer{background:#030303;padding:32px 8vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;border-top:1px solid rgba(255,255,255,0.04)}
+.fl{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--lime)}
+.fn{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.15);text-transform:uppercase}
+
+@media(max-width:768px){.ps-grid,.lever-grid,.ask-wrap{grid-template-columns:1fr}.cover-meta{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-logo">SANDLOT</div>
+  <div class="gate-sub">Investor Portal · Confidential</div>
+  <div class="gate-label">Enter Access Password</div>
+  <input class="gate-input" type="password" id="pwInput" placeholder="••••••••••" autocomplete="off">
+  <button class="gate-btn" onclick="checkPW()">ENTER →</button>
+  <div class="gate-err" id="pwErr">INCORRECT PASSWORD. CONTACT US FOR ACCESS.</div>
+  <a href="index.html" class="gate-back">← Back to sandlotsport.com</a>
+</div>
+
+<nav>
+  <a class="nav-logo" href="index.html">SANDLOT</a>
+  <span class="nav-conf">Confidential · For Accredited Investors Only</span>
+  <a href="index.html" class="nav-home">← Public Site</a>
+</nav>
+
+<!-- COVER -->
+<section class="cover">
+  <div class="cover-conf">Confidential Investment Overview · 2026</div>
+  <div class="cover-title">SAND<em>LOT</em><br>MOBILE<br>SPORTS</div>
+  <p class="cover-tagline">The operating system for community sports — bringing professional, affordable athletics to every neighborhood in America.</p>
+  <div class="cover-meta">
+    <div class="cm"><span class="cm-val">$2M</span><span class="cm-key">Seed Round</span></div>
+    <div class="cm"><span class="cm-val">$40B</span><span class="cm-key">Market Size</span></div>
+    <div class="cm"><span class="cm-val">1M</span><span class="cm-key">Member Target (Yr 3)</span></div>
+    <div class="cm"><span class="cm-val">$0</span><span class="cm-key">Equipment Cost</span></div>
+    <div class="cm"><span class="cm-val">Month 16</span><span class="cm-key">Break-Even</span></div>
+  </div>
+</section>
+
+<!-- PROBLEM / SOLUTION -->
+<section class="inv-section">
+  <div class="sec-num">01 — The Problem</div>
+  <div class="sec-title">SPORTS ACCESS<br>IS <span class="accent">BROKEN.</span></div>
+  <div class="ps-grid">
+    <div class="ps-block ps-problem">
+      <div class="ps-label">The Problem</div>
+      <h3>A $40B Market in Decline</h3>
+      <ul>
+        <li>70% of kids quit sports before age 13</li>
+        <li>Average quit age is now 11 — down from 13</li>
+        <li>Youth participation dropped 7 points in a decade</li>
+        <li>Low-income families 2× less likely to participate</li>
+        <li>Sports has become a luxury good</li>
+        <li>Equipment cost, fees & travel price out millions</li>
+      </ul>
+    </div>
+    <div class="ps-block ps-solution">
+      <div class="ps-label">The Sandlot Solution</div>
+      <h3>Mobile. Affordable. AI-Driven.</h3>
+      <ul>
+        <li>Fully-equipped truck arrives at your location</li>
+        <li>50+ sports · All ages · All skill levels</li>
+        <li>$19.99–$39.99/month membership</li>
+        <li>Institutional contracts cover 1,000s per deal</li>
+        <li>Zero equipment cost — manufacturer demo model</li>
+        <li>AI handles scheduling, routing & coaching</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- MARKET SIZE -->
+<section class="inv-section">
+  <div class="sec-num">02 — Market Opportunity</div>
+  <div class="sec-title">MASSIVE MARKET.<br><span class="accent">ZERO DIRECT</span><br>COMPETITION.</div>
+  <p class="prose">The youth and community sports market generates $40B+ annually in the US. No platform-based, AI-operated, mobile-first competitor exists. Sandlot creates an entirely new category.</p>
+  <div class="market-grid">
+    <div class="mkt-block"><div class="mkt-num">$40B</div><div class="mkt-label">US annual youth sports spending (Aspen Institute)</div></div>
+    <div class="mkt-block"><div class="mkt-num">75M</div><div class="mkt-label">US youth ages 6–18 · potential Sandlot participants</div></div>
+    <div class="mkt-block"><div class="mkt-num">$117B</div><div class="mkt-label">Annual cost of physical inactivity to US healthcare</div></div>
+    <div class="mkt-block"><div class="mkt-num">38M</div><div class="mkt-label">Multi-family housing units · primary B2B channel</div></div>
+    <div class="mkt-block"><div class="mkt-num">13,500</div><div class="mkt-label">US school districts · institutional sales channel</div></div>
+    <div class="mkt-block"><div class="mkt-num">19,500</div><div class="mkt-label">US cities & municipalities · government channel</div></div>
+  </div>
+</section>
+
+<!-- BUSINESS MODEL -->
+<section class="inv-section">
+  <div class="sec-num">03 — Business Model</div>
+  <div class="sec-title">FOUR REVENUE<br><span class="accent">STREAMS.</span></div>
+  <p class="prose">Sandlot's diversified model reduces risk and compounds growth. Membership creates recurring revenue. Institutional contracts create durable B2B revenue. Manufacturer partnerships make equipment free and generate co-marketing income. Data creates a long-term asset.</p>
+  <div class="model-grid">
+    <div class="model-block">
+      <div class="model-icon">👤</div>
+      <h4>Memberships</h4>
+      <p>$19.99–$39.99/month individual. $4–6/student/month institutional. Recurring, subscription revenue with low churn (sport habit formation).</p>
+      <div class="model-rev">$96M ARR run rate at 1M members ($8 blended ARPU)</div>
+    </div>
+    <div class="model-block">
+      <div class="model-icon">🏢</div>
+      <h4>Institutional Contracts</h4>
+      <p>Schools, cities, property managers, and corporations contract Sandlot as a service. Multi-year agreements. Low churn. Expands member base by thousands per deal.</p>
+      <div class="model-rev">Target: $5.4M ARR Year 3</div>
+    </div>
+    <div class="model-block">
+      <div class="model-icon">🏭</div>
+      <h4>Manufacturer Partnerships</h4>
+      <p>Sports brands provide demo equipment at zero cost. In return, Sandlot delivers coupon activations, purchase data, and co-marketing reach. $1–3 per activation = $12–36M/yr at scale.</p>
+      <div class="model-rev">Target: $3.6M ARR Year 3</div>
+    </div>
+    <div class="model-block">
+      <div class="model-icon">📊</div>
+      <h4>Data & Wellness</h4>
+      <p>1M active sports participants = a premium data asset. Health insurers, brands, and wellness platforms pay for access. FSA/HSA reimbursement integration adds B2B revenue channel.</p>
+      <div class="model-rev">Target: Long-term $10M+ opportunity</div>
+    </div>
+    <div class="model-block">
+      <div class="model-icon">🎪</div>
+      <h4>Per-Event Drop-In</h4>
+      <p>Non-members pay per event. Casual users, corporate events, and special occasions. Converts to memberships at scale.</p>
+      <div class="model-rev">Target: $2.4M ARR Year 3</div>
+    </div>
+    <div class="model-block">
+      <div class="model-icon">🏙️</div>
+      <h4>City Manager Rev Share</h4>
+      <p>Franchise-lite model. City Managers receive 8% of city revenue, accelerating expansion without full capital deployment from HQ.</p>
+      <div class="model-rev">Enables 50-city build without proportional HQ headcount</div>
+    </div>
+  </div>
+</section>
+
+<!-- FINANCIAL PROJECTIONS -->
+<section class="inv-section">
+  <div class="sec-num">04 — Financial Projections</div>
+  <div class="sec-title">THE <span class="accent">NUMBERS.</span></div>
+  <p class="prose">Assumes zero equipment cost (manufacturer model), blended ARPU of $8/month, Texas launch in Year 1, Sun Belt expansion in Year 2, national rollout in Year 3.</p>
+  <table class="proj-table">
+    <thead>
+      <tr>
+        <th style="text-align:left">Revenue Stream</th>
+        <th>Year 1</th>
+        <th>Year 2</th>
+        <th>Year 3</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Member Revenue <span style="font-size:11px;color:rgba(255,255,255,0.3)">(consumer + institutional, blended $8/mo)</span></td><td>$2.4M</td><td>$14.4M</td><td>$57.6M</td></tr>
+      <tr><td>Manufacturer Co-Marketing</td><td>$150K</td><td>$2.0M</td><td>$8.0M</td></tr>
+      <tr><td>Per-Event & Drop-In</td><td>$200K</td><td>$1.0M</td><td>$4.0M</td></tr>
+      <tr><td>Corporate Wellness</td><td>$80K</td><td>$500K</td><td>$2.0M</td></tr>
+      <tr style="background:rgba(168,230,61,0.04)"><td><strong>Total Revenue</strong></td><td class="pos"><strong>$2.8M</strong></td><td class="pos"><strong>$17.9M</strong></td><td class="pos"><strong>$71.6M</strong></td></tr>
+      <tr><td>Fleet & Operations <span style="font-size:11px;color:rgba(255,255,255,0.3)">(25 / 80 / 250 trucks × $4,200/mo)</span></td><td class="neg">($1.3M)</td><td class="neg">($4.0M)</td><td class="neg">($12.6M)</td></tr>
+      <tr><td>Staffing <span style="font-size:11px;color:rgba(255,255,255,0.3)">(GMs, City Mgrs, HQ)</span></td><td class="neg">($1.8M)</td><td class="neg">($5.5M)</td><td class="neg">($23.0M)</td></tr>
+      <tr><td>Technology & Platform</td><td class="neg">($350K)</td><td class="neg">($700K)</td><td class="neg">($2.0M)</td></tr>
+      <tr><td>Marketing & G&A</td><td class="neg">($400K)</td><td class="neg">($2.8M)</td><td class="neg">($5.0M)</td></tr>
+      <tr><td><strong>EBITDA</strong></td><td style="color:#e74c3c"><strong>($1.05M)</strong></td><td class="pos"><strong>$4.9M</strong></td><td class="pos"><strong>$29.0M</strong></td></tr>
+      <tr><td>Members (end of year)</td><td>50K</td><td>250K</td><td>1M+</td></tr>
+      <tr><td>ARR Run Rate (end of year)</td><td>$4.8M</td><td>$24M</td><td style="color:var(--lime)">$96M</td></tr>
+      <tr><td>Trucks</td><td>25</td><td>80</td><td>250</td></tr>
+    </tbody>
+  </table>
+  <div class="proj-note">Member Revenue calculated on average members during each year (~25K Y1, ~150K Y2, ~600K Y3) as base ramps. End-of-year ARR run rate shown separately. Equipment cost = $0 (manufacturer-provided). Blended ARPU = $8/month (institutional at $4–6, consumer at $20–30). Break-even ~Month 16. Staffing Y3 includes ~500 Game Managers + 50 City Managers + HQ.</div>
+</section>
+
+<!-- GROWTH TO 1M MEMBERS -->
+<section class="inv-section">
+  <div class="sec-num">05 — Path to 1 Million Members</div>
+  <div class="sec-title">INSTITUTIONAL<br><span class="accent">LEVERAGE</span><br>IS THE KEY.</div>
+  <p class="prose">Sandlot doesn't get to 1M members through consumer marketing. It gets there by signing the right institutional contracts — where a single school district agreement adds 10,000+ members overnight.</p>
+  <div class="lever-grid">
+    <div class="lever">
+      <div class="lever-num">01</div>
+      <div class="lever-content">
+        <h4>School Districts</h4>
+        <p>200 districts × avg. 3,000 students = 600,000 institutional members. One district management company partnership could unlock 100 schools at once.</p>
+        <div class="lever-target">TARGET: 600,000 MEMBERS</div>
+      </div>
+    </div>
+    <div class="lever">
+      <div class="lever-num">02</div>
+      <div class="lever-content">
+        <h4>Property Managers</h4>
+        <p>One Greystar or AIMCO deal unlocks hundreds of properties. 150 property companies × avg. 1,000 units = 250,000 household members.</p>
+        <div class="lever-target">TARGET: 250,000 MEMBERS</div>
+      </div>
+    </div>
+    <div class="lever">
+      <div class="lever-num">03</div>
+      <div class="lever-content">
+        <h4>City Contracts</h4>
+        <p>30 city contracts × avg. 5,000 enrolled residents = 150,000 members. City deals also generate press, grant eligibility, and school district introductions.</p>
+        <div class="lever-target">TARGET: 150,000 MEMBERS</div>
+      </div>
+    </div>
+    <div class="lever">
+      <div class="lever-num">04</div>
+      <div class="lever-content">
+        <h4>Viral + Individual</h4>
+        <p>25% organic growth on top of institutional base. Referral program, TikTok-worthy event moments, and manufacturer coupon drives convert event participants to members.</p>
+        <div class="lever-target">TARGET: 400,000 MEMBERS</div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:40px;background:rgba(168,230,61,0.06);border:1px solid rgba(168,230,61,0.15);padding:36px 40px;display:flex;align-items:center;gap:48px;flex-wrap:wrap">
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--lime);line-height:1">1.4M</div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:4px">Total Achievable by Year 3</div>
+    </div>
+    <p style="color:rgba(255,255,255,0.55);font-size:15px;max-width:480px;line-height:1.7">Conservative model targeting 1M paying members across all channels within 36 months of launch. Institutional channels alone can drive 750K+ without a single consumer marketing dollar spent.</p>
+  </div>
+</section>
+
+<!-- MOAT -->
+<section class="inv-section">
+  <div class="sec-num">06 — Competitive Moat</div>
+  <div class="sec-title">WHY THIS IS<br><span class="accent">DEFENSIBLE.</span></div>
+  <div class="moat-grid">
+    <div class="moat-block">
+      <div class="moat-icon">🏭</div>
+      <h4>Equipment Moat</h4>
+      <p>Once Sandlot has signed the top 20 sports manufacturers, no competitor can replicate zero-cost equipment. Manufacturers won't split demo budgets across platforms.</p>
+    </div>
+    <div class="moat-block">
+      <div class="moat-icon">🤖</div>
+      <h4>AI Operations Flywheel</h4>
+      <p>The routing and scheduling AI improves with every event. After 1M events, no human-run competitor can match our unit economics. Data compounds the moat daily.</p>
+    </div>
+    <div class="moat-block">
+      <div class="moat-icon">📍</div>
+      <h4>Scale Unlocks Contracts</h4>
+      <p>A national property management company won't sign with a 5-city startup. Scale creates contract eligibility. 50 cities unlocks the deals that 10 cities cannot.</p>
+    </div>
+    <div class="moat-block">
+      <div class="moat-icon">🏫</div>
+      <h4>Institutional Lock-In</h4>
+      <p>School districts and cities sign multi-year contracts. Once embedded in a district's PE program, switching costs are enormous. Institutional book = durable revenue.</p>
+    </div>
+    <div class="moat-block">
+      <div class="moat-icon">❤️</div>
+      <h4>Mission Brand</h4>
+      <p>Affordable community sports resonates across political and demographic lines. This mission creates organic advocacy, press, and word-of-mouth that money cannot buy.</p>
+    </div>
+    <div class="moat-block">
+      <div class="moat-icon">📊</div>
+      <h4>Member Data Asset</h4>
+      <p>1M active sports participants with behavioral data = a valuable asset for health insurers, brands, and wellness platforms. Growing in value as we scale.</p>
+    </div>
+  </div>
+</section>
+
+<!-- THE ASK -->
+<div class="ask-wrap">
+  <div class="ask-left">
+    <h2>SEED<br>ROUND</h2>
+    <p>We're raising $2M to launch in Texas, prove the model, and sign our first 50,000 members. This is the round that builds the case for a $15M Series A.</p>
+  </div>
+  <div class="ask-right">
+    <div class="ask-line"><span class="ask-label">Round Size</span><span class="ask-val">$2,000,000</span></div>
+    <div class="ask-line"><span class="ask-label">Structure</span><span class="ask-val">SAFE · MFN</span></div>
+    <div class="ask-line"><span class="ask-label">Valuation Cap</span><span class="ask-val">$8M</span></div>
+    <div class="ask-line"><span class="ask-label">Runway</span><span class="ask-val">18 Months</span></div>
+    <div class="use-of-funds">
+      <div class="uof-title">Use of Funds</div>
+      <div class="uof-item"><span>Fleet — 25 trucks (Texas)</span><span>$850K</span></div>
+      <div class="uof-item"><span>Technology & App Build</span><span>$480K</span></div>
+      <div class="uof-item"><span>HQ Team (18 months)</span><span>$420K</span></div>
+      <div class="uof-item"><span>City Manager Onboarding</span><span>$150K</span></div>
+      <div class="uof-item"><span>Legal, Insurance & Working Capital</span><span>$100K</span></div>
+      <div class="uof-item"><span>Total</span><span>$2,000,000</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- TEAM -->
+<section class="inv-section">
+  <div class="sec-num">07 — Team</div>
+  <div class="sec-title">BUILT TO<br><span class="accent">WIN.</span></div>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-name">CEO / Founder</div>
+      <div class="team-title">Sandlot</div>
+      <p class="team-bio">Salesforce consulting practice operator. Deep expertise in B2B systems, automation, and enterprise sales. Texas-based with established school district and property manager relationships.</p>
+    </div>
+    <div class="team-card">
+      <div class="team-name">COO</div>
+      <div class="team-title">Seeking · Operations Background</div>
+      <p class="team-bio">Target profile: Former logistics or field operations leader with experience scaling multi-location service businesses. Franchise or last-mile delivery experience a plus.</p>
+    </div>
+    <div class="team-card">
+      <div class="team-name">CTO</div>
+      <div class="team-title">Seeking · Platform Background</div>
+      <p class="team-bio">Target profile: Full-stack engineer who has built and scaled consumer or marketplace platforms. Experience with AI/ML scheduling systems, React Native mobile, and Salesforce integrations.</p>
+    </div>
+    <div class="team-card">
+      <div class="team-name">Head of Partnerships</div>
+      <div class="team-title">Seeking · Sports or CPG Background</div>
+      <p class="team-bio">Target profile: Relationship-driven sales leader with established contacts at major sports equipment manufacturers and national property management companies.</p>
+    </div>
+  </div>
+  <div style="margin-top:24px;padding:20px 24px;background:rgba(168,230,61,0.05);border-left:3px solid var(--lime);font-size:14px;color:rgba(255,255,255,0.5)">
+    <strong style="color:var(--lime)">Advisory Board (Seeking):</strong> Former pro athlete or coach · Youth sports academic (Aspen Institute) · School district superintendent · Sports brand CMO · Tech platform operator
+  </div>
+</section>
+
+<!-- EXIT -->
+<section class="inv-section">
+  <div class="sec-num">08 — Exit Strategy</div>
+  <div class="sec-title">MULTIPLE PATHS<br><span class="accent">TO LIQUIDITY.</span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:3px;margin-top:40px">
+    <div style="padding:32px;background:rgba(255,255,255,0.03);border-top:3px solid rgba(255,255,255,0.08)">
+      <div style="font-size:24px;margin-bottom:12px">👟</div>
+      <h4 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:8px">Strategic Acquirer</h4>
+      <p style="font-size:13px;color:rgba(255,255,255,0.45)">Nike, Adidas, Puma — seeking community activation platforms and consumer data. Sandlot at 1M members is an acquisition target at $200M+ valuation.</p>
+    </div>
+    <div style="padding:32px;background:rgba(255,255,255,0.03);border-top:3px solid rgba(255,255,255,0.08)">
+      <div style="font-size:24px;margin-bottom:12px">🏥</div>
+      <h4 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:8px">Health Insurer</h4>
+      <p style="font-size:13px;color:rgba(255,255,255,0.45)">UnitedHealth, Humana, Elevance seeking preventive wellness distribution. Sandlot as a benefits platform at scale is worth billions in avoided healthcare costs.</p>
+    </div>
+    <div style="padding:32px;background:rgba(255,255,255,0.03);border-top:3px solid rgba(255,255,255,0.08)">
+      <div style="font-size:24px;margin-bottom:12px">📺</div>
+      <h4 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:8px">Media / Sports Platform</h4>
+      <p style="font-size:13px;color:rgba(255,255,255,0.45)">ESPN, Amazon, DAZN building community sports infrastructure. Sandlot's 1M-member grassroots network is a distribution asset for sports media.</p>
+    </div>
+    <div style="padding:32px;background:rgba(255,255,255,0.03);border-top:3px solid rgba(255,255,255,0.08)">
+      <div style="font-size:24px;margin-bottom:12px">📈</div>
+      <h4 style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:8px">IPO Path</h4>
+      <p style="font-size:13px;color:rgba(255,255,255,0.45)">At $100M+ ARR with strong unit economics and 1M+ members, Sandlot is IPO-eligible. Mission-driven consumer + enterprise platform with clear comps (Peloton, ClassPass, Planet Fitness).</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div class="inv-cta">
+  <h2>LET'S HAVE<br>THE <span>CONVERSATION.</span></h2>
+  <p>We're talking to sports-focused angels, micro-VCs, and operators who believe in this mission. Reach out to schedule 30 minutes.</p>
+  <div class="inv-contact" id="invForm">
+    <input class="ic-input" type="text" placeholder="Your name & fund / firm" id="invName">
+    <input class="ic-input" type="email" placeholder="Email address" id="invEmail">
+    <input class="ic-input" type="text" placeholder="Investment focus / check size" id="invFocus">
+    <button class="ic-btn" onclick="submitInv()">REQUEST A MEETING →</button>
+  </div>
+  <div class="ic-success" id="invSuccess">✓ REQUEST RECEIVED — WE'LL BE IN TOUCH WITHIN 24 HOURS.</div>
+</div>
+
+<footer>
+  <div class="fl">SANDLOT</div>
+  <div class="fn">Confidential · For Accredited Investors Only · Not an Offer to Sell Securities · sandlotsport.com · 2026</div>
+</footer>
+
+<script>
+if(sessionStorage.getItem('sl_auth')==='1'){document.getElementById('gate').style.display='none';}
+function checkPW(){
+  if(document.getElementById('pwInput').value==='SANDLOT25'){
+    sessionStorage.setItem('sl_auth','1');
+    document.getElementById('gate').style.display='none';
+  } else {document.getElementById('pwErr').style.display='block';}
+}
+document.addEventListener('keydown',function(e){if(e.key==='Enter')checkPW();});
+function submitInv(){
+  const n=document.getElementById('invName').value;
+  const e=document.getElementById('invEmail').value;
+  if(!n||!e){alert('Please fill in your name and email.');return;}
+  document.getElementById('invForm').style.display='none';
+  document.getElementById('invSuccess').style.display='block';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandlot — For Apartments & Property Managers</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#1a3a5c;--lime:#a8e63d;--chalk:#f5f0e8;--grass:#2d5016;--dirt:#c4832a;--ink:#0f0f0f;--mid:#5a5a5a;--white:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--chalk);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden}
+#gate{position:fixed;inset:0;background:var(--sky);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gate-logo{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--lime);line-height:1}
+.gate-sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:48px}
+.gate-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:10px;width:320px}
+.gate-input{width:320px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);padding:16px 20px;font-size:16px;color:white;outline:none;letter-spacing:4px;text-align:center;font-family:'DM Sans',sans-serif}
+.gate-input:focus{border-color:var(--lime)}
+.gate-btn{width:320px;margin-top:12px;background:var(--lime);color:var(--ink);padding:16px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;border:none;cursor:pointer}
+.gate-err{width:320px;margin-top:10px;font-family:'Space Mono',monospace;font-size:11px;color:#e74c3c;display:none;text-align:center}
+.gate-back{margin-top:24px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.25);text-decoration:none;text-transform:uppercase}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 6vw;height:64px;background:rgba(26,58,92,0.97);backdrop-filter:blur(12px)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--lime);text-decoration:none}
+.nav-tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35)}
+.nav-cta{background:var(--lime);color:var(--ink);padding:8px 20px;font-weight:600;text-decoration:none;font-size:13px;font-family:'DM Sans',sans-serif}
+
+.hero{min-height:100vh;background:var(--sky);display:flex;flex-direction:column;justify-content:center;padding:120px 8vw 80px;position:relative;overflow:hidden}
+.hero::after{content:'🏢';position:absolute;right:6vw;bottom:-20px;font-size:clamp(200px,30vw,380px);opacity:.06;pointer-events:none}
+.hero-eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--lime);margin-bottom:16px}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,10vw,132px);color:var(--white);line-height:.9;letter-spacing:-1px;margin-bottom:28px}
+.hero h1 em{color:var(--lime);font-style:normal}
+.hero-sub{font-size:clamp(16px,2vw,20px);color:rgba(255,255,255,0.6);max-width:580px;font-weight:300;margin-bottom:44px}
+.btn-primary{background:var(--lime);color:var(--ink);padding:16px 36px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;border:none;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-ghost{background:transparent;color:var(--white);padding:14px 34px;font-family:'Bebas Neue',sans-serif;font-size:20px;border:2px solid rgba(255,255,255,0.25);cursor:pointer;text-decoration:none;display:inline-block;margin-left:12px}
+.hero-proof{display:flex;gap:48px;margin-top:60px;padding-top:48px;border-top:1px solid rgba(255,255,255,0.1);flex-wrap:wrap}
+.hp{display:flex;flex-direction:column}
+.hp-num{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--lime);line-height:1}
+.hp-label{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:rgba(255,255,255,0.4);margin-top:2px}
+
+.section{padding:88px 8vw}
+.section-sky{background:var(--sky);color:var(--white)}
+.section-grass{background:var(--grass);color:var(--white)}
+.section-chalk{background:var(--chalk)}
+.section-ink{background:var(--ink);color:var(--white)}
+.eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;opacity:.6}
+.section-sky .eyebrow,.section-grass .eyebrow,.section-ink .eyebrow{color:var(--lime)}
+.section-chalk .eyebrow{color:var(--sky)}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,6vw,76px);line-height:.95;margin-bottom:36px}
+.accent{color:var(--lime)}
+.accent-sky{color:var(--sky)}
+.prose{max-width:660px;font-size:16px;line-height:1.8;color:var(--mid)}
+.prose-light{color:rgba(255,255,255,0.65)}
+
+/* PROBLEM */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:48px}
+.problem-block{padding:44px 36px;background:rgba(255,255,255,0.04)}
+.pb-icon{font-size:32px;margin-bottom:14px}
+.problem-block h3{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--white);margin-bottom:10px}
+.problem-block p{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7}
+
+/* HOW WE HELP */
+.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:48px;align-items:start}
+.help-img{background:var(--sky);padding:64px 48px;display:flex;flex-direction:column;gap:20px}
+.help-truck{font-size:80px;text-align:center;margin-bottom:8px}
+.help-spec{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.1);font-size:13px;color:rgba(255,255,255,0.6)}
+.help-spec span:last-child{color:var(--lime);font-family:'Space Mono',monospace;font-size:12px}
+.help-content{}
+.help-item{padding:28px 0;border-bottom:1px solid rgba(0,0,0,0.08);display:flex;gap:20px;align-items:flex-start}
+.help-item:last-child{border-bottom:none}
+.hi-num{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--lime);opacity:.35;line-height:1;min-width:44px}
+.hi-title{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--sky);margin-bottom:6px}
+.hi-desc{font-size:14px;color:var(--mid);line-height:1.65}
+
+/* AMENITY WAR */
+.amenity-wrap{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:48px}
+.amenity-bad{padding:40px 36px;background:rgba(0,0,0,0.06);border-top:3px solid rgba(0,0,0,0.1)}
+.amenity-good{padding:40px 36px;background:rgba(168,230,61,0.12);border-top:3px solid var(--lime)}
+.amenity-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px}
+.amenity-bad .amenity-label{color:var(--mid)}
+.amenity-good .amenity-label{color:var(--grass)}
+.amenity-bad h3{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--mid);margin-bottom:12px}
+.amenity-good h3{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--sky);margin-bottom:12px}
+.amenity-list{list-style:none;font-size:13px;line-height:2.1}
+.amenity-bad .amenity-list{color:var(--mid)}
+.amenity-good .amenity-list{color:var(--grass)}
+.amenity-bad .amenity-list li::before{content:'✗  ';color:#c0392b}
+.amenity-good .amenity-list li::before{content:'✓  ';color:var(--grass)}
+
+/* PRICING */
+.pricing-box{background:var(--sky);padding:56px 48px;margin-top:48px}
+.pricing-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;gap:16px}
+.pricing-box h3{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--white)}
+.pricing-tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:3px}
+.pt{padding:32px 28px;background:rgba(255,255,255,0.06)}
+.pt-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:10px}
+.pt-price{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--lime);line-height:1;margin-bottom:4px}
+.pt-unit{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:20px}
+.pt-features{list-style:none;font-size:12px;line-height:2;color:rgba(255,255,255,0.6)}
+.pt-features li::before{content:'✓  ';color:var(--lime)}
+.pricing-note{margin-top:24px;padding:16px 20px;background:rgba(168,230,61,0.08);border-left:3px solid var(--lime);font-size:13px;color:rgba(255,255,255,0.65)}
+
+/* ROI SECTION */
+.roi-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:48px}
+.roi-card{padding:40px 32px;background:var(--white);border-top:4px solid var(--lime);box-shadow:0 2px 20px rgba(0,0,0,0.06)}
+.roi-num{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--sky);line-height:1;margin-bottom:6px}
+.roi-card h4{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--sky);margin-bottom:10px}
+.roi-card p{font-size:13px;color:var(--mid);line-height:1.65}
+
+/* CTA */
+.cta{background:var(--grass);padding:96px 8vw;text-align:center}
+.cta h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,96px);color:var(--chalk);line-height:.9;margin-bottom:24px}
+.cta-form{display:flex;flex-direction:column;gap:12px;max-width:480px;margin:0 auto}
+.cta-input{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:15px;color:white;outline:none}
+.cta-input::placeholder{color:rgba(255,255,255,0.4)}
+.cta-input:focus{border-color:var(--lime)}
+.cta-btn{background:var(--lime);color:var(--ink);padding:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;border:none;cursor:pointer}
+.cta-success{display:none;padding:20px;background:rgba(168,230,61,0.15);border:2px solid var(--lime);color:var(--lime);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;max-width:480px;margin:0 auto;text-align:center}
+
+.chalk-divider{height:4px;background:repeating-linear-gradient(90deg,var(--lime),var(--lime) 24px,transparent 24px,transparent 36px);opacity:.35}
+footer{background:var(--ink);padding:40px 8vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--lime)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{color:rgba(255,255,255,0.35);text-decoration:none;font-size:12px;font-family:'Space Mono',monospace;letter-spacing:1px}
+
+@media(max-width:768px){
+  .problem-grid,.help-grid,.amenity-wrap,.roi-grid{grid-template-columns:1fr}
+  .hero-proof{gap:24px}
+}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-logo">SANDLOT</div>
+  <div class="gate-sub">Property Partner Portal</div>
+  <div class="gate-label">Enter Access Password</div>
+  <input class="gate-input" type="password" id="pwInput" placeholder="••••••••••" autocomplete="off">
+  <button class="gate-btn" onclick="checkPW()">ENTER →</button>
+  <div class="gate-err" id="pwErr">INCORRECT PASSWORD. CONTACT YOUR SANDLOT REPRESENTATIVE.</div>
+  <a href="index.html" class="gate-back">← Back to sandlotsport.com</a>
+</div>
+
+<nav>
+  <a class="nav-logo" href="index.html">SANDLOT</a>
+  <span class="nav-tag">For Apartments & Properties</span>
+  <a href="#contact" class="nav-cta">Get a Quote</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">For Property Managers & HOAs</div>
+  <h1>THE AMENITY<br>RESIDENTS<br><em>ACTUALLY USE.</em></h1>
+  <p class="hero-sub">Sandlot turns your parking lot, courtyard, or green space into a premium sports experience — fully staffed, fully equipped, fully managed. You just schedule it. We handle the rest.</p>
+  <div>
+    <a href="#contact" class="btn-primary">Get Sandlot for Your Property</a>
+    <a href="#how" class="btn-ghost">See How It Works</a>
+  </div>
+  <div class="hero-proof">
+    <div class="hp"><span class="hp-num">$0</span><span class="hp-label">Equipment Cost to You</span></div>
+    <div class="hp"><span class="hp-num">15min</span><span class="hp-label">Setup Time</span></div>
+    <div class="hp"><span class="hp-num">All</span><span class="hp-label">Ages Welcome</span></div>
+    <div class="hp"><span class="hp-num">50+</span><span class="hp-label">Sports Available</span></div>
+  </div>
+</section>
+
+<!-- THE PROBLEM -->
+<section class="section section-sky" id="problem">
+  <div class="eyebrow">The Amenity War</div>
+  <div class="section-title">RESIDENTS WANT<br>MORE THAN A <span class="accent">GYM.</span></div>
+  <p class="prose prose-light">The amenity arms race is real — and the same fitness centers, dog parks, and rooftop lounges aren't winning anymore. Residents want programming. Community. Things to do together. Sandlot delivers exactly that.</p>
+  <div class="problem-grid">
+    <div class="problem-block">
+      <div class="pb-icon">📊</div>
+      <h3>Amenity Fatigue is Real</h3>
+      <p>Study after study shows residents rank "programming and events" higher than static amenities like gyms and pools when choosing where to live. The fitness center gets used — the community event gets remembered.</p>
+    </div>
+    <div class="problem-block">
+      <div class="pb-icon">🔑</div>
+      <h3>Retention is the ROI</h3>
+      <p>The cost of turning over a unit — vacancy, cleaning, leasing fees — averages $3,500–$7,000. If Sandlot keeps even one additional resident per year from moving out, it has paid for itself many times over.</p>
+    </div>
+    <div class="problem-block">
+      <div class="pb-icon">🏆</div>
+      <h3>Differentiation is Dying</h3>
+      <p>Every new apartment complex has a gym, a pool, and a clubhouse. They're table stakes. Sandlot is still new, still remarkable, and still something residents will tell their friends about.</p>
+    </div>
+    <div class="problem-block">
+      <div class="pb-icon">👨‍👩‍👧</div>
+      <h3>Families Are Underserved</h3>
+      <p>Families with kids make up the most stable, high-value resident segment. They also have the fewest amenity options in most complexes. Sandlot is the only turnkey solution that serves kids, parents, and seniors simultaneously.</p>
+    </div>
+  </div>
+</section>
+
+<div class="chalk-divider"></div>
+
+<!-- HOW WE HELP -->
+<section class="section section-chalk" id="how">
+  <div class="eyebrow">The Service</div>
+  <div class="section-title">WE SHOW UP.<br><span class="accent-sky">YOU TAKE</span><br>THE CREDIT.</div>
+  <div class="help-grid">
+    <div class="help-img">
+      <div class="help-truck">🚚</div>
+      <div class="help-spec"><span>Setup time</span><span>Under 15 minutes</span></div>
+      <div class="help-spec"><span>Participants per event</span><span>Up to 60</span></div>
+      <div class="help-spec"><span>Sports per event</span><span>1–3 simultaneous</span></div>
+      <div class="help-spec"><span>Staff provided</span><span>1 driver + 2 Game Managers</span></div>
+      <div class="help-spec"><span>Insurance</span><span>Certificate provided</span></div>
+      <div class="help-spec"><span>Equipment</span><span>All included, $0</span></div>
+      <div class="help-spec"><span>Space required</span><span>Courtyard, lot, or lawn</span></div>
+    </div>
+    <div class="help-content">
+      <div class="help-item">
+        <div class="hi-num">01</div>
+        <div>
+          <div class="hi-title">You Schedule It</div>
+          <p class="hi-desc">Pick your dates through the Sandlot property dashboard. Weekly, bi-weekly, or monthly recurring — we work around your community calendar.</p>
+        </div>
+      </div>
+      <div class="help-item">
+        <div class="hi-num">02</div>
+        <div>
+          <div class="hi-title">We Handle Everything</div>
+          <p class="hi-desc">Our AI routes the nearest truck to your property. A Game Manager runs the session, manages participants of all ages, and ensures a safe, fun experience. You don't lift a finger.</p>
+        </div>
+      </div>
+      <div class="help-item">
+        <div class="hi-num">03</div>
+        <div>
+          <div class="hi-title">Residents Get Membership Access</div>
+          <p class="hi-desc">Your residents receive Sandlot membership benefits as part of their residency — they can also attend events at parks, schools, and other locations across the city.</p>
+        </div>
+      </div>
+      <div class="help-item">
+        <div class="hi-num">04</div>
+        <div>
+          <div class="hi-title">You Get the Data</div>
+          <p class="hi-desc">Monthly participation reports, resident engagement scores, and event summaries — ready to share with ownership or put in your next renewal pitch.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AMENITY COMPARISON -->
+<section class="section section-chalk" style="padding-top:0">
+  <div class="eyebrow">Side by Side</div>
+  <div class="section-title">SANDLOT VS.<br><span class="accent-sky">THE REST.</span></div>
+  <div class="amenity-wrap">
+    <div class="amenity-bad">
+      <div class="amenity-label">Typical Property Amenities</div>
+      <h3>Status Quo</h3>
+      <ul class="amenity-list">
+        <li>Gym used by 15% of residents</li>
+        <li>Pool available 4 months/year</li>
+        <li>Dog park requires no programming</li>
+        <li>Clubhouse sits empty most days</li>
+        <li>No programming for kids</li>
+        <li>No community-building moments</li>
+        <li>High capex, low engagement</li>
+        <li>Residents forget it's there</li>
+      </ul>
+    </div>
+    <div class="amenity-good">
+      <div class="amenity-label">Sandlot at Your Property</div>
+      <h3>Sandlot Difference</h3>
+      <ul class="amenity-list">
+        <li>Events draw 20–60 residents each time</li>
+        <li>Year-round — indoors or outdoors</li>
+        <li>All ages: kids, adults, seniors</li>
+        <li>50+ sports — something for everyone</li>
+        <li>Residents meet neighbors</li>
+        <li>Something to post about</li>
+        <li>Zero capex — we own all equipment</li>
+        <li>Residents tell their friends</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section section-chalk" style="padding-top:0" id="pricing">
+  <div class="eyebrow">Pricing</div>
+  <div class="section-title">STRAIGHTFORWARD<br><span class="accent-sky">PRICING.</span></div>
+  <div class="pricing-box">
+    <div class="pricing-header">
+      <h3>Property & HOA Plans</h3>
+      <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.3);text-transform:uppercase">All plans include insurance certificate</span>
+    </div>
+    <div class="pricing-tiers">
+      <div class="pt">
+        <div class="pt-label">Starter</div>
+        <div class="pt-price">$499</div>
+        <div class="pt-unit">per event · up to 150 units</div>
+        <ul class="pt-features">
+          <li>1 sport station</li>
+          <li>Up to 30 participants</li>
+          <li>2 Game Managers</li>
+          <li>Basic participation report</li>
+          <li>Resident app access</li>
+        </ul>
+      </div>
+      <div class="pt" style="background:rgba(168,230,61,0.1);border:1px solid rgba(168,230,61,0.2)">
+        <div class="pt-label" style="color:var(--lime)">Community · Most Popular</div>
+        <div class="pt-price">$799</div>
+        <div class="pt-unit">per event · any size property</div>
+        <ul class="pt-features">
+          <li>2–3 sport stations</li>
+          <li>Up to 60 participants</li>
+          <li>Full Game Manager team</li>
+          <li>Monthly engagement report</li>
+          <li>Resident Sandlot memberships</li>
+          <li>Co-branded marketing materials</li>
+        </ul>
+      </div>
+      <div class="pt">
+        <div class="pt-label">Property Portfolio</div>
+        <div class="pt-price">Custom</div>
+        <div class="pt-unit">multi-property contract</div>
+        <ul class="pt-features">
+          <li>Dedicated city coordinator</li>
+          <li>Rotating schedule across properties</li>
+          <li>Branded resident app portal</li>
+          <li>Priority scheduling</li>
+          <li>Monthly executive report</li>
+          <li>Greystar, AIMCO, Lincoln pricing</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pricing-note">
+      <strong style="color:var(--lime)">Multi-property discount:</strong> Properties scheduling 4+ events/month receive 20% off per event. Portfolio companies (10+ properties) receive dedicated account management and custom pricing.
+    </div>
+  </div>
+</section>
+
+<!-- ROI -->
+<section class="section section-chalk" style="padding-top:0">
+  <div class="eyebrow">The Business Case</div>
+  <div class="section-title">THE ROI IS<br><span class="accent-sky">OBVIOUS.</span></div>
+  <div class="roi-grid">
+    <div class="roi-card">
+      <div class="roi-num">$5K</div>
+      <h4>Cost of One Unit Turnover</h4>
+      <p>Vacancy, cleaning, leasing commissions, and concessions average $3,500–$7,000 per unit. One additional renewal per year covers 6–14 months of Sandlot programming.</p>
+    </div>
+    <div class="roi-card">
+      <div class="roi-num">4.2x</div>
+      <h4>Higher Event Usage Than Gym</h4>
+      <p>Industry data shows programmed community events see 4x higher participation rates than static fitness amenities. Sandlot events fill up. Treadmills collect dust.</p>
+    </div>
+    <div class="roi-card">
+      <div class="roi-num">$0</div>
+      <h4>Equipment Investment</h4>
+      <p>No storage. No maintenance. No liability for broken gear. All equipment is owned, managed, and replaced by Sandlot. You provide the space — we do everything else.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="contact">
+  <h2>LET'S TALK<br>ABOUT YOUR<br>PROPERTY.</h2>
+  <p style="font-size:18px;color:rgba(245,240,232,0.7);margin-bottom:40px;max-width:480px;margin-left:auto;margin-right:auto">Tell us about your property and we'll put together a custom proposal within 48 hours.</p>
+  <div class="cta-form" id="ctaForm">
+    <input class="cta-input" type="text" placeholder="Your name & title" id="ctaName">
+    <input class="cta-input" type="text" placeholder="Property name & city" id="ctaProperty">
+    <input class="cta-input" type="text" placeholder="Number of units" id="ctaUnits">
+    <input class="cta-input" type="email" placeholder="Business email" id="ctaEmail">
+    <button class="cta-btn" onclick="submitForm()">GET MY CUSTOM PROPOSAL →</button>
+  </div>
+  <div class="cta-success" id="ctaSuccess">✓ GOT IT — WE'LL HAVE YOUR PROPOSAL READY WITHIN 48 HOURS.</div>
+</section>
+
+<div class="chalk-divider"></div>
+<footer>
+  <div class="footer-logo">SANDLOT</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="schools.html">Schools</a>
+    <a href="cities.html">Cities</a>
+    <a href="manufacturers.html">Manufacturers</a>
+  </div>
+</footer>
+
+<script>
+if(sessionStorage.getItem('sl_auth')==='1'){document.getElementById('gate').style.display='none';}
+function checkPW(){
+  if(document.getElementById('pwInput').value==='SANDLOT25'){
+    sessionStorage.setItem('sl_auth','1');
+    document.getElementById('gate').style.display='none';
+  } else {document.getElementById('pwErr').style.display='block';}
+}
+document.addEventListener('keydown',function(e){if(e.key==='Enter')checkPW();});
+function submitForm(){
+  const n=document.getElementById('ctaName').value;
+  const e=document.getElementById('ctaEmail').value;
+  if(!n||!e){alert('Please fill in your name and email.');return;}
+  document.getElementById('ctaForm').style.display='none';
+  document.getElementById('ctaSuccess').style.display='block';
+}
+</script>
+</body>
+</html>

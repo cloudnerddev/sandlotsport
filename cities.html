@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandlot — For Cities & Municipalities</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#1a3a5c;--lime:#a8e63d;--chalk:#f5f0e8;--grass:#2d5016;--dirt:#c4832a;--ink:#0f0f0f;--mid:#5a5a5a;--white:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--chalk);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden}
+#gate{position:fixed;inset:0;background:var(--grass);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gate-logo{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--lime);line-height:1}
+.gate-sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:48px}
+.gate-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:10px;width:320px}
+.gate-input{width:320px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);padding:16px 20px;font-size:16px;color:white;outline:none;letter-spacing:4px;text-align:center;font-family:'DM Sans',sans-serif}
+.gate-input:focus{border-color:var(--lime)}
+.gate-btn{width:320px;margin-top:12px;background:var(--lime);color:var(--ink);padding:16px;font-family:'Bebas Neue',sans-serif;font-size:22px;border:none;cursor:pointer}
+.gate-err{width:320px;margin-top:10px;font-family:'Space Mono',monospace;font-size:11px;color:#e74c3c;display:none;text-align:center}
+.gate-back{margin-top:24px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.25);text-decoration:none;text-transform:uppercase}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 6vw;height:64px;background:rgba(45,80,22,0.96);backdrop-filter:blur(12px)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--lime);text-decoration:none}
+.nav-tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35)}
+.nav-cta{background:var(--lime);color:var(--ink);padding:8px 20px;font-weight:600;text-decoration:none;font-size:13px}
+
+.hero{min-height:100vh;background:var(--grass);display:flex;flex-direction:column;justify-content:center;padding:120px 8vw 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(255,255,255,0.02) 80px,rgba(255,255,255,0.02) 81px)}
+.hero-eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--lime);margin-bottom:16px}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,10vw,132px);color:var(--white);line-height:.9;letter-spacing:-1px;margin-bottom:28px}
+.hero h1 em{color:var(--lime);font-style:normal}
+.hero-sub{font-size:clamp(16px,2vw,20px);color:rgba(255,255,255,0.6);max-width:600px;font-weight:300;margin-bottom:44px}
+.btn-p{background:var(--lime);color:var(--ink);padding:16px 36px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;border:none;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-g{background:transparent;color:var(--white);padding:14px 34px;font-family:'Bebas Neue',sans-serif;font-size:20px;border:2px solid rgba(255,255,255,0.25);text-decoration:none;display:inline-block;margin-left:12px}
+.hero-proof{display:flex;gap:48px;margin-top:60px;padding-top:48px;border-top:1px solid rgba(255,255,255,0.1);flex-wrap:wrap}
+.hp{display:flex;flex-direction:column}
+.hp-num{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--lime);line-height:1}
+.hp-label{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:rgba(255,255,255,0.4);margin-top:2px}
+
+.section{padding:88px 8vw}
+.section-sky{background:var(--sky);color:var(--white)}
+.section-grass{background:var(--grass);color:var(--white)}
+.section-chalk{background:var(--chalk)}
+.section-dirt{background:var(--dirt);color:var(--white)}
+.eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;opacity:.7}
+.section-sky .eyebrow,.section-grass .eyebrow,.section-dirt .eyebrow{color:var(--lime)}
+.section-chalk .eyebrow{color:var(--grass)}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,6vw,76px);line-height:.95;margin-bottom:36px}
+.accent-lime{color:var(--lime)}
+.accent-grass{color:var(--grass)}
+.prose{max-width:680px;font-size:16px;line-height:1.8}
+.prose-light{color:rgba(255,255,255,0.65)}
+.prose-dark{color:var(--mid)}
+
+/* CHALLENGE BLOCKS */
+.challenge-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:48px}
+.cb{padding:44px 36px;background:rgba(255,255,255,0.04)}
+.cb-icon{font-size:28px;margin-bottom:12px}
+.cb h3{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--white);margin-bottom:10px}
+.cb p{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7}
+
+/* HOW WE WORK */
+.work-timeline{margin-top:48px}
+.wt-item{display:grid;grid-template-columns:100px 1fr;gap:32px;margin-bottom:40px;position:relative}
+.wt-item::before{content:'';position:absolute;left:49px;top:64px;width:2px;height:calc(100% + 40px);background:var(--lime);opacity:.2}
+.wt-item:last-child::before{display:none}
+.wt-num{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--lime);opacity:.3;line-height:1;text-align:center}
+.wt-content h3{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);margin-bottom:8px}
+.wt-content p{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.7;max-width:520px}
+
+/* PARKS MAP CONCEPT */
+.parks-wrap{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:48px}
+.parks-visual{background:var(--sky);padding:48px;position:relative;min-height:320px;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.parks-visual-emoji{font-size:80px;margin-bottom:20px}
+.parks-visual p{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--white);text-align:center;line-height:1.2}
+.parks-visual em{color:var(--lime);font-style:normal}
+.parks-content h3{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--sky);margin-bottom:16px}
+.parks-content p{font-size:15px;color:var(--mid);line-height:1.75;margin-bottom:20px}
+.parks-stat{display:flex;align-items:flex-end;gap:12px;margin-bottom:12px}
+.parks-stat-num{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--grass);line-height:1}
+.parks-stat-label{font-size:13px;color:var(--mid);padding-bottom:6px}
+
+/* CONTRACT OPTIONS */
+.contract-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:48px}
+.contract-card{padding:40px 32px;border-top:4px solid var(--lime);background:var(--white);box-shadow:0 2px 16px rgba(0,0,0,0.06)}
+.cc-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--mid);margin-bottom:10px}
+.cc-price{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--sky);line-height:1;margin-bottom:4px}
+.cc-unit{font-size:12px;color:var(--mid);margin-bottom:20px}
+.cc-features{list-style:none;font-size:13px;line-height:2;color:var(--mid)}
+.cc-features li::before{content:'✓  ';color:var(--grass)}
+
+/* GRANT BOX */
+.grant-box{background:var(--lime);padding:56px 48px;margin-top:48px}
+.grant-box h3{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--grass);margin-bottom:16px}
+.grant-box p{font-size:16px;color:rgba(45,80,22,0.75);max-width:640px;margin-bottom:24px;line-height:1.75}
+.grant-sources{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.grant-tag{background:rgba(45,80,22,0.15);border:1px solid rgba(45,80,22,0.25);padding:8px 16px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--grass)}
+
+/* PILOT */
+.pilot-strip{background:var(--sky);padding:72px 8vw;text-align:center}
+.pilot-strip h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,96px);color:var(--white);line-height:.9;margin-bottom:16px}
+.pilot-strip p{font-size:18px;color:rgba(255,255,255,0.6);max-width:560px;margin:0 auto 40px}
+
+/* CTA FORM */
+.cta-form{display:flex;flex-direction:column;gap:12px;max-width:480px;margin:0 auto}
+.cta-input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);padding:16px 20px;font-family:'DM Sans',sans-serif;font-size:15px;color:white;outline:none}
+.cta-input::placeholder{color:rgba(255,255,255,0.35)}
+.cta-input:focus{border-color:var(--lime)}
+.cta-btn{background:var(--lime);color:var(--ink);padding:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;border:none;cursor:pointer}
+.cta-success{display:none;padding:20px;background:rgba(168,230,61,0.12);border:2px solid var(--lime);color:var(--lime);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;max-width:480px;margin:0 auto;text-align:center}
+.chalk-divider{height:4px;background:repeating-linear-gradient(90deg,var(--lime),var(--lime) 24px,transparent 24px,transparent 36px);opacity:.3}
+footer{background:var(--ink);padding:40px 8vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--lime)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{color:rgba(255,255,255,0.35);text-decoration:none;font-size:12px;font-family:'Space Mono',monospace}
+@media(max-width:768px){.challenge-grid,.parks-wrap{grid-template-columns:1fr}.hero-proof{gap:24px}.wt-item{grid-template-columns:60px 1fr}}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-logo">SANDLOT</div>
+  <div class="gate-sub">City & Government Partner Portal</div>
+  <div class="gate-label">Enter Access Password</div>
+  <input class="gate-input" type="password" id="pwInput" placeholder="••••••••••" autocomplete="off">
+  <button class="gate-btn" onclick="checkPW()">ENTER →</button>
+  <div class="gate-err" id="pwErr">INCORRECT PASSWORD. CONTACT YOUR SANDLOT REPRESENTATIVE.</div>
+  <a href="index.html" class="gate-back">← Back to sandlotsport.com</a>
+</div>
+
+<nav>
+  <a class="nav-logo" href="index.html">SANDLOT</a>
+  <span class="nav-tag">For Cities & Municipalities</span>
+  <a href="#contact" class="nav-cta">Start a Pilot</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">For Parks, Recreation & City Leaders</div>
+  <h1>SPORTS IN<br>EVERY PARK.<br><em>NOT JUST</em><br><em>THE BIG ONES.</em></h1>
+  <p class="hero-sub">Sandlot is a turnkey mobile sports operation that brings professional programming to every park, plaza, and green space in your city — at a fraction of what traditional rec facilities cost to run.</p>
+  <div>
+    <a href="#contact" class="btn-p">Start a Pilot Program</a>
+    <a href="#how" class="btn-g">How It Works</a>
+  </div>
+  <div class="hero-proof">
+    <div class="hp"><span class="hp-num">50+</span><span class="hp-label">Sports Available</span></div>
+    <div class="hp"><span class="hp-num">60</span><span class="hp-label">Participants Per Event</span></div>
+    <div class="hp"><span class="hp-num">All</span><span class="hp-label">Ages & Income Levels</span></div>
+    <div class="hp"><span class="hp-num">$0</span><span class="hp-label">Facility Capex</span></div>
+  </div>
+</section>
+
+<!-- CHALLENGE -->
+<section class="section section-sky" id="challenge">
+  <div class="eyebrow">The Challenge</div>
+  <div class="section-title">YOUR PARKS<br>BUDGET GOES<br><span class="accent-lime">FURTHER NOW.</span></div>
+  <p class="prose prose-light">Cities spend billions building and maintaining parks and recreation facilities — but programming has always been the hard part. Sandlot gives you the programming infrastructure without the overhead, the staff, or the storage.</p>
+  <div class="challenge-grid">
+    <div class="cb">
+      <div class="cb-icon">🏟️</div>
+      <h3>Big Facilities, Limited Reach</h3>
+      <p>Your recreation centers serve the neighborhoods within driving distance. The other 80% of your city — apartment complexes, smaller parks, underserved ZIP codes — gets nothing. Sandlot fills that gap.</p>
+    </div>
+    <div class="cb">
+      <div class="cb-icon">👷</div>
+      <h3>Staffing Is the Bottleneck</h3>
+      <p>Hiring, training, and retaining qualified recreation staff is the hardest problem in municipal parks. Sandlot brings fully trained, certified Game Managers to every event. No city HR involvement required.</p>
+    </div>
+    <div class="cb">
+      <div class="cb-icon">📦</div>
+      <h3>Equipment Storage & Maintenance</h3>
+      <p>City recreation equipment ages, breaks, gets stolen, and requires storage space. Sandlot owns all equipment. We maintain it, store it, and replace it on our dime. Zero burden on city facilities.</p>
+    </div>
+    <div class="cb">
+      <div class="cb-icon">📊</div>
+      <h3>Programming ROI Is Hard to Measure</h3>
+      <p>City councils want data. How many residents were served? Which neighborhoods? Which age groups? Sandlot provides monthly participation reports, ZIP-code breakdowns, and constituent satisfaction data — ready for your council presentation.</p>
+    </div>
+  </div>
+</section>
+
+<div class="chalk-divider"></div>
+
+<!-- HOW WE WORK -->
+<section class="section section-chalk" id="how">
+  <div class="eyebrow">How We Operate</div>
+  <div class="section-title">TURNKEY FROM<br><span class="accent-grass">DAY ONE.</span></div>
+  <div class="work-timeline">
+    <div class="wt-item">
+      <div class="wt-num">01</div>
+      <div class="wt-content">
+        <h3>We Map Your City</h3>
+        <p>Our team works with Parks & Rec to identify optimal locations — underserved parks, high-density neighborhoods, school grounds, and plazas. We build a rotating schedule that maximizes geographic coverage.</p>
+      </div>
+    </div>
+    <div class="wt-item">
+      <div class="wt-num">02</div>
+      <div class="wt-content">
+        <h3>Contract Execution</h3>
+        <p>We provide an RFP-ready proposal, insurance certificates (GL + commercial auto), and a standard city services agreement. Our legal templates are already written for municipal procurement. Approval-to-launch in 30–60 days.</p>
+      </div>
+    </div>
+    <div class="wt-item">
+      <div class="wt-num">03</div>
+      <div class="wt-content">
+        <h3>Programming Begins</h3>
+        <p>Sandlot trucks arrive on schedule. Our AI routes trucks optimally across your park system daily. Game Managers run sessions for all ages — from kids' flag football to senior pickleball to family volleyball nights.</p>
+      </div>
+    </div>
+    <div class="wt-item">
+      <div class="wt-num">04</div>
+      <div class="wt-content">
+        <h3>You Get the Credit</h3>
+        <p>Sandlot programs carry your city's co-branding. Participants see it as a city service. Monthly reports give your Parks Director the data to justify budget allocation and make the case for expansion.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARKS REACH -->
+<section class="section section-chalk" style="padding-top:0">
+  <div class="eyebrow">Geographic Coverage</div>
+  <div class="section-title">SERVE YOUR<br><span class="accent-grass">WHOLE CITY.</span></div>
+  <div class="parks-wrap">
+    <div class="parks-visual">
+      <div class="parks-visual-emoji">🗺️</div>
+      <p>Every park.<br>Every ZIP code.<br><em>Every resident.</em></p>
+    </div>
+    <div class="parks-content">
+      <h3>The Neighborhood Equity Argument</h3>
+      <p>Traditional rec centers serve the neighborhoods closest to them. Sandlot's mobile model means programming goes where residents are — not where the real estate budget allowed a building to be built 40 years ago.</p>
+      <p>One city contract with Sandlot can activate 20–30 park locations in a single month. No other city investment achieves that geographic spread.</p>
+      <div class="parks-stat">
+        <span class="parks-stat-num">30</span>
+        <span class="parks-stat-label">park locations activated per truck per month</span>
+      </div>
+      <div class="parks-stat">
+        <span class="parks-stat-num">1,800</span>
+        <span class="parks-stat-label">residents served per truck per month</span>
+      </div>
+      <div class="parks-stat">
+        <span class="parks-stat-num">$8</span>
+        <span class="parks-stat-label">estimated cost per participant served</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTRACT OPTIONS -->
+<section class="section section-chalk" style="padding-top:0" id="pricing">
+  <div class="eyebrow">Contract Options</div>
+  <div class="section-title">BUILT FOR<br><span class="accent-grass">MUNICIPAL BUDGETS.</span></div>
+  <p class="prose prose-dark">All contracts include insurance certificates, branded event materials, monthly reporting, and a dedicated Sandlot city coordinator. No hidden fees.</p>
+  <div class="contract-grid">
+    <div class="contract-card">
+      <div class="cc-label">Pilot Program</div>
+      <div class="cc-price">$2,500</div>
+      <div class="cc-unit">per month · 3-month pilot · 1 truck</div>
+      <ul class="cc-features">
+        <li>1 Sandlot truck, 4 events/week</li>
+        <li>Up to 4 park locations rotating</li>
+        <li>All ages programming</li>
+        <li>Monthly participation report</li>
+        <li>Insurance certificate included</li>
+        <li>Renew or expand after 3 months</li>
+      </ul>
+    </div>
+    <div class="contract-card" style="border-color:var(--grass)">
+      <div class="cc-label" style="color:var(--grass)">City Program · Most Popular</div>
+      <div class="cc-price">Custom</div>
+      <div class="cc-unit">annual contract · 2–10 trucks</div>
+      <ul class="cc-features">
+        <li>Fleet sized to your park system</li>
+        <li>Rotating schedule across all districts</li>
+        <li>Co-branded as city program</li>
+        <li>Quarterly council presentation data</li>
+        <li>Dedicated city coordinator</li>
+        <li>Grant-eligible budget line</li>
+        <li>School coordination included</li>
+      </ul>
+    </div>
+    <div class="contract-card">
+      <div class="cc-label">Special Events</div>
+      <div class="cc-price">$1,800</div>
+      <div class="cc-unit">per event · single booking</div>
+      <ul class="cc-features">
+        <li>City festivals & events</li>
+        <li>Community health fairs</li>
+        <li>National Night Out activation</li>
+        <li>Holiday programming</li>
+        <li>2–3 sport stations</li>
+        <li>Up to 6 hours on-site</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- GRANTS -->
+<section class="section section-chalk" style="padding-top:0">
+  <div class="eyebrow">Funding Sources</div>
+  <div class="grant-box">
+    <h3>YOUR SANDLOT CONTRACT<br>MAY BE GRANT-ELIGIBLE.</h3>
+    <p>Community sports programming, youth physical activity, and public health initiatives are all eligible for federal, state, and foundation funding. We've done the homework so you don't have to — and we'll help you write the grant language.</p>
+    <div class="grant-sources">
+      <span class="grant-tag">USDA Rural Development</span>
+      <span class="grant-tag">CDC Community Health</span>
+      <span class="grant-tag">HHS Physical Activity Grants</span>
+      <span class="grant-tag">American Rescue Plan Funds</span>
+      <span class="grant-tag">State Parks & Rec Grants</span>
+      <span class="grant-tag">Robert Wood Johnson Foundation</span>
+      <span class="grant-tag">Aspen Institute Project Play</span>
+      <span class="grant-tag">Local Community Foundations</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA PILOT -->
+<div class="pilot-strip" id="contact">
+  <h2>START YOUR<br>PILOT TODAY.</h2>
+  <p>We'll put together a custom proposal for your city — including park coverage maps, projected participation numbers, and grant-language templates — within 5 business days.</p>
+  <div class="cta-form" id="ctaForm">
+    <input class="cta-input" type="text" placeholder="Your name & title" id="ctaName">
+    <input class="cta-input" type="text" placeholder="City & State" id="ctaCity">
+    <input class="cta-input" type="text" placeholder="Population / number of parks" id="ctaSize">
+    <input class="cta-input" type="email" placeholder="Government email address" id="ctaEmail">
+    <button class="cta-btn" onclick="submitForm()">REQUEST CITY PROPOSAL →</button>
+  </div>
+  <div class="cta-success" id="ctaSuccess">✓ REQUEST RECEIVED — OUR CITY PARTNERSHIPS TEAM WILL BE IN TOUCH WITHIN 5 BUSINESS DAYS.</div>
+</div>
+
+<div class="chalk-divider"></div>
+<footer>
+  <div class="footer-logo">SANDLOT</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="apartments.html">Apartments</a>
+    <a href="schools.html">Schools</a>
+    <a href="manufacturers.html">Manufacturers</a>
+  </div>
+</footer>
+
+<script>
+if(sessionStorage.getItem('sl_auth')==='1'){document.getElementById('gate').style.display='none';}
+function checkPW(){
+  if(document.getElementById('pwInput').value==='SANDLOT25'){
+    sessionStorage.setItem('sl_auth','1');
+    document.getElementById('gate').style.display='none';
+  } else {document.getElementById('pwErr').style.display='block';}
+}
+document.addEventListener('keydown',function(e){if(e.key==='Enter')checkPW();});
+function submitForm(){
+  const n=document.getElementById('ctaName').value;
+  const e=document.getElementById('ctaEmail').value;
+  if(!n||!e){alert('Please fill in your name and email.');return;}
+  document.getElementById('ctaForm').style.display='none';
+  document.getElementById('ctaSuccess').style.display='block';
+}
+</script>
+</body>
+</html>
